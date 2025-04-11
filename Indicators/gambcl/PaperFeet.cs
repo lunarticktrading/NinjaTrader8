@@ -57,7 +57,6 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
 				ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
                 //Disable this property if your indicator requires custom values that cumulate with each new market data event. 
                 //See Help Guide for additional information.
-                IsSuspendedWhileInactive                    = true;
                 LRSIType                                    = LRSITypeEnum.LaguerreRSIWithFractalEnergy;
                 Alpha                                       = 0.2;
                 NFE                                         = 8;
@@ -83,6 +82,9 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
             }
             else if (State == State.Configure)
 			{
+                // Disable IsSuspendedWhileInactive if alerts are enabled.
+                IsSuspendedWhileInactive = !EnableAlerts;
+
                 _lrsi = LaguerreRSI(LRSIType == LRSITypeEnum.LaguerreRSIWithFractalEnergy, Alpha, NFE, GLength, BetaDev, OverboughtLevel, OversoldLevel, OverboughtRegionBrush, OversoldRegionBrush, RegionOpacity, false, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
                 _isRsiInitialized = false;
 

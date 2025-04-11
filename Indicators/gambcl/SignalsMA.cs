@@ -46,7 +46,6 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
                 ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
                 //Disable this property if your indicator requires custom values that cumulate with each new market data event. 
                 //See Help Guide for additional information.
-                IsSuspendedWhileInactive					= true;
                 MAType										= NinjaTrader.NinjaScript.Indicators.gambcl.SignalsMAEnums.MATypeEnum.SMA;
                 Period										= 9;
                 SignalOffset								= 10;
@@ -63,6 +62,9 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
             }
             else if (State == State.Configure)
             {
+                // Disable IsSuspendedWhileInactive if alerts are enabled.
+                IsSuspendedWhileInactive = !EnableAlerts;
+
                 _longEntrySignal = new Series<bool>(this);
                 _shortEntrySignal = new Series<bool>(this);
             }

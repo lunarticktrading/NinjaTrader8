@@ -48,7 +48,6 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
                 ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
                 //Disable this property if your indicator requires custom values that cumulate with each new market data event. 
                 //See Help Guide for additional information.
-                IsSuspendedWhileInactive					= true;
                 UseFractalEnergy					        = true;
                 Alpha					                    = 0.2;
                 NFE					                        = 8;
@@ -69,6 +68,9 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
             }
             else if (State == State.Configure)
             {
+                // Disable IsSuspendedWhileInactive if alerts are enabled.
+                IsSuspendedWhileInactive = !EnableAlerts;
+
                 _l0Series = new Series<double>(this);
                 _l1Series = new Series<double>(this);
                 _l2Series = new Series<double>(this);
