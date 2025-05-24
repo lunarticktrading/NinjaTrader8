@@ -4,6 +4,8 @@
 
 !AddOns
 !AddOns/*
+!AddOns/gambcl
+!AddOns/gambcl/*
 
 !Indicators
 Indicators/*
