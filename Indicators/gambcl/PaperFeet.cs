@@ -105,6 +105,9 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
         {
             get
             {
+                if (State == State.SetDefaults)
+                    return DefaultName;
+
                 if (LRSIType == LRSITypeEnum.LaguerreRSI)
                     return Name + "(" + LRSIType + "," + Alpha + ")";
                 else

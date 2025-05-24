@@ -50,7 +50,13 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
 
         public override string DisplayName
         {
-            get { return Name + "(" + ShowRealOpen + "," + ShowRealClose + ")"; }
+            get
+            {
+                if (State == State.SetDefaults)
+                    return DefaultName;
+
+                return Name + "(" + ShowRealOpen + "," + ShowRealClose + ")";
+            }
         }
 
         protected override void OnBarUpdate()

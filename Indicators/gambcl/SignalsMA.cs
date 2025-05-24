@@ -72,7 +72,13 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
 
         public override string DisplayName
         {
-            get { return Name + "(" + MAType + "," + Period + ")"; }
+            get
+            {
+                if (State == State.SetDefaults)
+                    return DefaultName;
+
+                return Name + "(" + MAType + "," + Period + ")";
+            }
         }
         
         protected override void OnBarUpdate()

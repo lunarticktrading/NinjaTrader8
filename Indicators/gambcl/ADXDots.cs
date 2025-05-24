@@ -58,7 +58,13 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
 
         public override string DisplayName
         {
-            get { return Name + "(" + Period + "," + MediumTrendThreshold + ","  + StrongTrendThreshold + ")"; }
+            get
+            {
+                if (State == State.SetDefaults)
+                    return DefaultName;
+
+                return Name + "(" + Period + "," + MediumTrendThreshold + ","  + StrongTrendThreshold + ")";
+            }
         }
 
         protected override void OnBarUpdate()

@@ -86,6 +86,9 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
         {
             get
             {
+                if (State == State.SetDefaults)
+                    return DefaultName;
+
                 if (UseFractalEnergy)
                     return Name + "(" + UseFractalEnergy + "," + NFE + "," + GLength + "," + BetaDev + ")";
                 else
