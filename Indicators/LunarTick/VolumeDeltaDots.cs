@@ -10,7 +10,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.gambcl
+namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     // This indicator makes use of Volume Delta by Gill
     // https://ninjatraderecosystem.com/user-app-share-download/delta-volume-update/
@@ -149,19 +149,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private gambcl.VolumeDeltaDots[] cacheVolumeDeltaDots;
-		public gambcl.VolumeDeltaDots VolumeDeltaDots(int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
+		private LunarTick.VolumeDeltaDots[] cacheVolumeDeltaDots;
+		public LunarTick.VolumeDeltaDots VolumeDeltaDots(int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
 		{
 			return VolumeDeltaDots(Input, displayLevel, bullishVolumeDeltaBrush, equalVolumeDeltaBrush, bearishVolumeDeltaBrush, showLabel);
 		}
 
-		public gambcl.VolumeDeltaDots VolumeDeltaDots(ISeries<double> input, int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
+		public LunarTick.VolumeDeltaDots VolumeDeltaDots(ISeries<double> input, int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
 		{
 			if (cacheVolumeDeltaDots != null)
 				for (int idx = 0; idx < cacheVolumeDeltaDots.Length; idx++)
 					if (cacheVolumeDeltaDots[idx] != null && cacheVolumeDeltaDots[idx].DisplayLevel == displayLevel && cacheVolumeDeltaDots[idx].BullishVolumeDeltaBrush == bullishVolumeDeltaBrush && cacheVolumeDeltaDots[idx].EqualVolumeDeltaBrush == equalVolumeDeltaBrush && cacheVolumeDeltaDots[idx].BearishVolumeDeltaBrush == bearishVolumeDeltaBrush && cacheVolumeDeltaDots[idx].ShowLabel == showLabel && cacheVolumeDeltaDots[idx].EqualsInput(input))
 						return cacheVolumeDeltaDots[idx];
-			return CacheIndicator<gambcl.VolumeDeltaDots>(new gambcl.VolumeDeltaDots(){ DisplayLevel = displayLevel, BullishVolumeDeltaBrush = bullishVolumeDeltaBrush, EqualVolumeDeltaBrush = equalVolumeDeltaBrush, BearishVolumeDeltaBrush = bearishVolumeDeltaBrush, ShowLabel = showLabel }, input, ref cacheVolumeDeltaDots);
+			return CacheIndicator<LunarTick.VolumeDeltaDots>(new LunarTick.VolumeDeltaDots(){ DisplayLevel = displayLevel, BullishVolumeDeltaBrush = bullishVolumeDeltaBrush, EqualVolumeDeltaBrush = equalVolumeDeltaBrush, BearishVolumeDeltaBrush = bearishVolumeDeltaBrush, ShowLabel = showLabel }, input, ref cacheVolumeDeltaDots);
 		}
 	}
 }
@@ -170,12 +170,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.gambcl.VolumeDeltaDots VolumeDeltaDots(int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
+		public Indicators.LunarTick.VolumeDeltaDots VolumeDeltaDots(int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
 		{
 			return indicator.VolumeDeltaDots(Input, displayLevel, bullishVolumeDeltaBrush, equalVolumeDeltaBrush, bearishVolumeDeltaBrush, showLabel);
 		}
 
-		public Indicators.gambcl.VolumeDeltaDots VolumeDeltaDots(ISeries<double> input , int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
+		public Indicators.LunarTick.VolumeDeltaDots VolumeDeltaDots(ISeries<double> input , int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
 		{
 			return indicator.VolumeDeltaDots(input, displayLevel, bullishVolumeDeltaBrush, equalVolumeDeltaBrush, bearishVolumeDeltaBrush, showLabel);
 		}
@@ -186,12 +186,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.gambcl.VolumeDeltaDots VolumeDeltaDots(int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
+		public Indicators.LunarTick.VolumeDeltaDots VolumeDeltaDots(int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
 		{
 			return indicator.VolumeDeltaDots(Input, displayLevel, bullishVolumeDeltaBrush, equalVolumeDeltaBrush, bearishVolumeDeltaBrush, showLabel);
 		}
 
-		public Indicators.gambcl.VolumeDeltaDots VolumeDeltaDots(ISeries<double> input , int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
+		public Indicators.LunarTick.VolumeDeltaDots VolumeDeltaDots(ISeries<double> input , int displayLevel, Brush bullishVolumeDeltaBrush, Brush equalVolumeDeltaBrush, Brush bearishVolumeDeltaBrush, bool showLabel)
 		{
 			return indicator.VolumeDeltaDots(input, displayLevel, bullishVolumeDeltaBrush, equalVolumeDeltaBrush, bearishVolumeDeltaBrush, showLabel);
 		}

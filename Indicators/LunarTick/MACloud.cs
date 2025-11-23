@@ -9,7 +9,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.gambcl
+namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     namespace MACloudEnums
     {
@@ -50,7 +50,7 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
                 ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
                 //Disable this property if your indicator requires custom values that cumulate with each new market data event. 
                 //See Help Guide for additional information.
-                MAType										= NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum.EMA;
+                MAType										= NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum.EMA;
                 FastPeriod									= 9;
                 SlowPeriod									= 21;
                 BullishCloudBrush							= Brushes.Green;
@@ -100,8 +100,8 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
             if (CurrentBar < Math.Max(FastPeriod, SlowPeriod))
                 return;
 
-            FastMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum.EMA) ? (EMA(Close, FastPeriod)[0]) : (SMA(Close, FastPeriod)[0]);
-            SlowMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum.EMA) ? (EMA(Close, SlowPeriod)[0]) : (SMA(Close, SlowPeriod)[0]);
+            FastMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum.EMA) ? (EMA(Close, FastPeriod)[0]) : (SMA(Close, FastPeriod)[0]);
+            SlowMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum.EMA) ? (EMA(Close, SlowPeriod)[0]) : (SMA(Close, SlowPeriod)[0]);
 
             if (!IsVisible)
                 return;
@@ -201,7 +201,7 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
         #region Properties
         [NinjaScriptProperty]
         [Display(Name = "MA Type", Description = "The type of Moving Average.", Order = 1, GroupName = "Parameters")]
-        public NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum MAType
+        public NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum MAType
         { get; set; }
 
         [NinjaScriptProperty]
@@ -314,19 +314,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private gambcl.MACloud[] cacheMACloud;
-		public gambcl.MACloud MACloud(NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
+		private LunarTick.MACloud[] cacheMACloud;
+		public LunarTick.MACloud MACloud(NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
 		{
 			return MACloud(Input, mAType, fastPeriod, slowPeriod, bullishCloudBrush, bearishCloudBrush, cloudOpacity, enableSignals, signalOffset, signalPrefix, enableAlerts, alertSoundsPath, longEntryAlert, shortEntryAlert);
 		}
 
-		public gambcl.MACloud MACloud(ISeries<double> input, NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
+		public LunarTick.MACloud MACloud(ISeries<double> input, NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
 		{
 			if (cacheMACloud != null)
 				for (int idx = 0; idx < cacheMACloud.Length; idx++)
 					if (cacheMACloud[idx] != null && cacheMACloud[idx].MAType == mAType && cacheMACloud[idx].FastPeriod == fastPeriod && cacheMACloud[idx].SlowPeriod == slowPeriod && cacheMACloud[idx].BullishCloudBrush == bullishCloudBrush && cacheMACloud[idx].BearishCloudBrush == bearishCloudBrush && cacheMACloud[idx].CloudOpacity == cloudOpacity && cacheMACloud[idx].EnableSignals == enableSignals && cacheMACloud[idx].SignalOffset == signalOffset && cacheMACloud[idx].SignalPrefix == signalPrefix && cacheMACloud[idx].EnableAlerts == enableAlerts && cacheMACloud[idx].AlertSoundsPath == alertSoundsPath && cacheMACloud[idx].LongEntryAlert == longEntryAlert && cacheMACloud[idx].ShortEntryAlert == shortEntryAlert && cacheMACloud[idx].EqualsInput(input))
 						return cacheMACloud[idx];
-			return CacheIndicator<gambcl.MACloud>(new gambcl.MACloud(){ MAType = mAType, FastPeriod = fastPeriod, SlowPeriod = slowPeriod, BullishCloudBrush = bullishCloudBrush, BearishCloudBrush = bearishCloudBrush, CloudOpacity = cloudOpacity, EnableSignals = enableSignals, SignalOffset = signalOffset, SignalPrefix = signalPrefix, EnableAlerts = enableAlerts, AlertSoundsPath = alertSoundsPath, LongEntryAlert = longEntryAlert, ShortEntryAlert = shortEntryAlert }, input, ref cacheMACloud);
+			return CacheIndicator<LunarTick.MACloud>(new LunarTick.MACloud(){ MAType = mAType, FastPeriod = fastPeriod, SlowPeriod = slowPeriod, BullishCloudBrush = bullishCloudBrush, BearishCloudBrush = bearishCloudBrush, CloudOpacity = cloudOpacity, EnableSignals = enableSignals, SignalOffset = signalOffset, SignalPrefix = signalPrefix, EnableAlerts = enableAlerts, AlertSoundsPath = alertSoundsPath, LongEntryAlert = longEntryAlert, ShortEntryAlert = shortEntryAlert }, input, ref cacheMACloud);
 		}
 	}
 }
@@ -335,12 +335,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.gambcl.MACloud MACloud(NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
+		public Indicators.LunarTick.MACloud MACloud(NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
 		{
 			return indicator.MACloud(Input, mAType, fastPeriod, slowPeriod, bullishCloudBrush, bearishCloudBrush, cloudOpacity, enableSignals, signalOffset, signalPrefix, enableAlerts, alertSoundsPath, longEntryAlert, shortEntryAlert);
 		}
 
-		public Indicators.gambcl.MACloud MACloud(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
+		public Indicators.LunarTick.MACloud MACloud(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
 		{
 			return indicator.MACloud(input, mAType, fastPeriod, slowPeriod, bullishCloudBrush, bearishCloudBrush, cloudOpacity, enableSignals, signalOffset, signalPrefix, enableAlerts, alertSoundsPath, longEntryAlert, shortEntryAlert);
 		}
@@ -351,12 +351,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.gambcl.MACloud MACloud(NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
+		public Indicators.LunarTick.MACloud MACloud(NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
 		{
 			return indicator.MACloud(Input, mAType, fastPeriod, slowPeriod, bullishCloudBrush, bearishCloudBrush, cloudOpacity, enableSignals, signalOffset, signalPrefix, enableAlerts, alertSoundsPath, longEntryAlert, shortEntryAlert);
 		}
 
-		public Indicators.gambcl.MACloud MACloud(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.gambcl.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
+		public Indicators.LunarTick.MACloud MACloud(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.LunarTick.MACloudEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod, Brush bullishCloudBrush, Brush bearishCloudBrush, int cloudOpacity, bool enableSignals, int signalOffset, string signalPrefix, bool enableAlerts, string alertSoundsPath, string longEntryAlert, string shortEntryAlert)
 		{
 			return indicator.MACloud(input, mAType, fastPeriod, slowPeriod, bullishCloudBrush, bearishCloudBrush, cloudOpacity, enableSignals, signalOffset, signalPrefix, enableAlerts, alertSoundsPath, longEntryAlert, shortEntryAlert);
 		}

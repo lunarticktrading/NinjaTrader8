@@ -6,16 +6,22 @@
 !AddOns/*
 !AddOns/gambcl
 !AddOns/gambcl/*
+!AddOns/LunarTick
+!AddOns/LunarTick/*
 
 !Indicators
 Indicators/*
 !Indicators/gambcl
 !Indicators/gambcl/*
+!Indicators/LunarTick
+!Indicators/LunarTick/*
 
 !Strategies
 Strategies/*
 !Strategies/gambcl
 !Strategies/gambcl/*
+!Strategies/LunarTick
+!Strategies/LunarTick/*
 
 !Templates
 !Templates/*

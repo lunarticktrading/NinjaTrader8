@@ -9,7 +9,7 @@ using NinjaTrader.Gui.Chart;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.gambcl
+namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     [Gui.CategoryOrder("Parameters", 1)]
     [Gui.CategoryOrder("Laguerre RSI", 2)]
@@ -32,6 +32,11 @@ namespace NinjaTrader.NinjaScript.Indicators.gambcl
         #endregion
 
         #region Indicator methods
+        public LaguerreRSI()
+        {
+            VendorLicense(283);
+        }
+
         protected override void OnStateChange()
         {
             if (State == State.SetDefaults)
@@ -406,19 +411,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private gambcl.LaguerreRSI[] cacheLaguerreRSI;
-		public gambcl.LaguerreRSI LaguerreRSI(bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
+		private LunarTick.LaguerreRSI[] cacheLaguerreRSI;
+		public LunarTick.LaguerreRSI LaguerreRSI(bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
 		{
 			return LaguerreRSI(Input, useFractalEnergy, alpha, nFE, gLength, betaDev, overboughtLevel, oversoldLevel, overboughtRegionBrush, oversoldRegionBrush, regionOpacity, enableAlerts, alertSoundsPath, enterOverboughtAlert, exitOverboughtAlert, enterOversoldAlert, exitOversoldAlert);
 		}
 
-		public gambcl.LaguerreRSI LaguerreRSI(ISeries<double> input, bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
+		public LunarTick.LaguerreRSI LaguerreRSI(ISeries<double> input, bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
 		{
 			if (cacheLaguerreRSI != null)
 				for (int idx = 0; idx < cacheLaguerreRSI.Length; idx++)
 					if (cacheLaguerreRSI[idx] != null && cacheLaguerreRSI[idx].UseFractalEnergy == useFractalEnergy && cacheLaguerreRSI[idx].Alpha == alpha && cacheLaguerreRSI[idx].NFE == nFE && cacheLaguerreRSI[idx].GLength == gLength && cacheLaguerreRSI[idx].BetaDev == betaDev && cacheLaguerreRSI[idx].OverboughtLevel == overboughtLevel && cacheLaguerreRSI[idx].OversoldLevel == oversoldLevel && cacheLaguerreRSI[idx].OverboughtRegionBrush == overboughtRegionBrush && cacheLaguerreRSI[idx].OversoldRegionBrush == oversoldRegionBrush && cacheLaguerreRSI[idx].RegionOpacity == regionOpacity && cacheLaguerreRSI[idx].EnableAlerts == enableAlerts && cacheLaguerreRSI[idx].AlertSoundsPath == alertSoundsPath && cacheLaguerreRSI[idx].EnterOverboughtAlert == enterOverboughtAlert && cacheLaguerreRSI[idx].ExitOverboughtAlert == exitOverboughtAlert && cacheLaguerreRSI[idx].EnterOversoldAlert == enterOversoldAlert && cacheLaguerreRSI[idx].ExitOversoldAlert == exitOversoldAlert && cacheLaguerreRSI[idx].EqualsInput(input))
 						return cacheLaguerreRSI[idx];
-			return CacheIndicator<gambcl.LaguerreRSI>(new gambcl.LaguerreRSI(){ UseFractalEnergy = useFractalEnergy, Alpha = alpha, NFE = nFE, GLength = gLength, BetaDev = betaDev, OverboughtLevel = overboughtLevel, OversoldLevel = oversoldLevel, OverboughtRegionBrush = overboughtRegionBrush, OversoldRegionBrush = oversoldRegionBrush, RegionOpacity = regionOpacity, EnableAlerts = enableAlerts, AlertSoundsPath = alertSoundsPath, EnterOverboughtAlert = enterOverboughtAlert, ExitOverboughtAlert = exitOverboughtAlert, EnterOversoldAlert = enterOversoldAlert, ExitOversoldAlert = exitOversoldAlert }, input, ref cacheLaguerreRSI);
+			return CacheIndicator<LunarTick.LaguerreRSI>(new LunarTick.LaguerreRSI(){ UseFractalEnergy = useFractalEnergy, Alpha = alpha, NFE = nFE, GLength = gLength, BetaDev = betaDev, OverboughtLevel = overboughtLevel, OversoldLevel = oversoldLevel, OverboughtRegionBrush = overboughtRegionBrush, OversoldRegionBrush = oversoldRegionBrush, RegionOpacity = regionOpacity, EnableAlerts = enableAlerts, AlertSoundsPath = alertSoundsPath, EnterOverboughtAlert = enterOverboughtAlert, ExitOverboughtAlert = exitOverboughtAlert, EnterOversoldAlert = enterOversoldAlert, ExitOversoldAlert = exitOversoldAlert }, input, ref cacheLaguerreRSI);
 		}
 	}
 }
@@ -427,12 +432,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.gambcl.LaguerreRSI LaguerreRSI(bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
+		public Indicators.LunarTick.LaguerreRSI LaguerreRSI(bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
 		{
 			return indicator.LaguerreRSI(Input, useFractalEnergy, alpha, nFE, gLength, betaDev, overboughtLevel, oversoldLevel, overboughtRegionBrush, oversoldRegionBrush, regionOpacity, enableAlerts, alertSoundsPath, enterOverboughtAlert, exitOverboughtAlert, enterOversoldAlert, exitOversoldAlert);
 		}
 
-		public Indicators.gambcl.LaguerreRSI LaguerreRSI(ISeries<double> input , bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
+		public Indicators.LunarTick.LaguerreRSI LaguerreRSI(ISeries<double> input , bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
 		{
 			return indicator.LaguerreRSI(input, useFractalEnergy, alpha, nFE, gLength, betaDev, overboughtLevel, oversoldLevel, overboughtRegionBrush, oversoldRegionBrush, regionOpacity, enableAlerts, alertSoundsPath, enterOverboughtAlert, exitOverboughtAlert, enterOversoldAlert, exitOversoldAlert);
 		}
@@ -443,12 +448,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.gambcl.LaguerreRSI LaguerreRSI(bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
+		public Indicators.LunarTick.LaguerreRSI LaguerreRSI(bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
 		{
 			return indicator.LaguerreRSI(Input, useFractalEnergy, alpha, nFE, gLength, betaDev, overboughtLevel, oversoldLevel, overboughtRegionBrush, oversoldRegionBrush, regionOpacity, enableAlerts, alertSoundsPath, enterOverboughtAlert, exitOverboughtAlert, enterOversoldAlert, exitOversoldAlert);
 		}
 
-		public Indicators.gambcl.LaguerreRSI LaguerreRSI(ISeries<double> input , bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
+		public Indicators.LunarTick.LaguerreRSI LaguerreRSI(ISeries<double> input , bool useFractalEnergy, double alpha, int nFE, int gLength, int betaDev, double overboughtLevel, double oversoldLevel, Brush overboughtRegionBrush, Brush oversoldRegionBrush, int regionOpacity, bool enableAlerts, string alertSoundsPath, string enterOverboughtAlert, string exitOverboughtAlert, string enterOversoldAlert, string exitOversoldAlert)
 		{
 			return indicator.LaguerreRSI(input, useFractalEnergy, alpha, nFE, gLength, betaDev, overboughtLevel, oversoldLevel, overboughtRegionBrush, oversoldRegionBrush, regionOpacity, enableAlerts, alertSoundsPath, enterOverboughtAlert, exitOverboughtAlert, enterOversoldAlert, exitOversoldAlert);
 		}

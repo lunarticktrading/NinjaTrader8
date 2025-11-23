@@ -10,7 +10,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.gambcl
+namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     public class HeikenAshiDots : Indicator
     {
@@ -164,19 +164,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private gambcl.HeikenAshiDots[] cacheHeikenAshiDots;
-		public gambcl.HeikenAshiDots HeikenAshiDots(int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
+		private LunarTick.HeikenAshiDots[] cacheHeikenAshiDots;
+		public LunarTick.HeikenAshiDots HeikenAshiDots(int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
 		{
 			return HeikenAshiDots(Input, displayLevel, bullishTrendBrush, changingTrendBrush, bearishTrendBrush, showLabel);
 		}
 
-		public gambcl.HeikenAshiDots HeikenAshiDots(ISeries<double> input, int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
+		public LunarTick.HeikenAshiDots HeikenAshiDots(ISeries<double> input, int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
 		{
 			if (cacheHeikenAshiDots != null)
 				for (int idx = 0; idx < cacheHeikenAshiDots.Length; idx++)
 					if (cacheHeikenAshiDots[idx] != null && cacheHeikenAshiDots[idx].DisplayLevel == displayLevel && cacheHeikenAshiDots[idx].BullishTrendBrush == bullishTrendBrush && cacheHeikenAshiDots[idx].ChangingTrendBrush == changingTrendBrush && cacheHeikenAshiDots[idx].BearishTrendBrush == bearishTrendBrush && cacheHeikenAshiDots[idx].ShowLabel == showLabel && cacheHeikenAshiDots[idx].EqualsInput(input))
 						return cacheHeikenAshiDots[idx];
-			return CacheIndicator<gambcl.HeikenAshiDots>(new gambcl.HeikenAshiDots(){ DisplayLevel = displayLevel, BullishTrendBrush = bullishTrendBrush, ChangingTrendBrush = changingTrendBrush, BearishTrendBrush = bearishTrendBrush, ShowLabel = showLabel }, input, ref cacheHeikenAshiDots);
+			return CacheIndicator<LunarTick.HeikenAshiDots>(new LunarTick.HeikenAshiDots(){ DisplayLevel = displayLevel, BullishTrendBrush = bullishTrendBrush, ChangingTrendBrush = changingTrendBrush, BearishTrendBrush = bearishTrendBrush, ShowLabel = showLabel }, input, ref cacheHeikenAshiDots);
 		}
 	}
 }
@@ -185,12 +185,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.gambcl.HeikenAshiDots HeikenAshiDots(int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
+		public Indicators.LunarTick.HeikenAshiDots HeikenAshiDots(int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
 		{
 			return indicator.HeikenAshiDots(Input, displayLevel, bullishTrendBrush, changingTrendBrush, bearishTrendBrush, showLabel);
 		}
 
-		public Indicators.gambcl.HeikenAshiDots HeikenAshiDots(ISeries<double> input , int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
+		public Indicators.LunarTick.HeikenAshiDots HeikenAshiDots(ISeries<double> input , int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
 		{
 			return indicator.HeikenAshiDots(input, displayLevel, bullishTrendBrush, changingTrendBrush, bearishTrendBrush, showLabel);
 		}
@@ -201,12 +201,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.gambcl.HeikenAshiDots HeikenAshiDots(int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
+		public Indicators.LunarTick.HeikenAshiDots HeikenAshiDots(int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
 		{
 			return indicator.HeikenAshiDots(Input, displayLevel, bullishTrendBrush, changingTrendBrush, bearishTrendBrush, showLabel);
 		}
 
-		public Indicators.gambcl.HeikenAshiDots HeikenAshiDots(ISeries<double> input , int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
+		public Indicators.LunarTick.HeikenAshiDots HeikenAshiDots(ISeries<double> input , int displayLevel, Brush bullishTrendBrush, Brush changingTrendBrush, Brush bearishTrendBrush, bool showLabel)
 		{
 			return indicator.HeikenAshiDots(input, displayLevel, bullishTrendBrush, changingTrendBrush, bearishTrendBrush, showLabel);
 		}

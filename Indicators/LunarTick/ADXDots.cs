@@ -9,7 +9,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.gambcl
+namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     [Gui.CategoryOrder("Parameters", 1)]
     [Gui.CategoryOrder("Display", 2)]
@@ -179,19 +179,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private gambcl.ADXDots[] cacheADXDots;
-		public gambcl.ADXDots ADXDots(int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
+		private LunarTick.ADXDots[] cacheADXDots;
+		public LunarTick.ADXDots ADXDots(int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
 		{
 			return ADXDots(Input, period, displayLevel, mediumTrendThreshold, strongTrendThreshold, showLabel);
 		}
 
-		public gambcl.ADXDots ADXDots(ISeries<double> input, int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
+		public LunarTick.ADXDots ADXDots(ISeries<double> input, int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
 		{
 			if (cacheADXDots != null)
 				for (int idx = 0; idx < cacheADXDots.Length; idx++)
 					if (cacheADXDots[idx] != null && cacheADXDots[idx].Period == period && cacheADXDots[idx].DisplayLevel == displayLevel && cacheADXDots[idx].MediumTrendThreshold == mediumTrendThreshold && cacheADXDots[idx].StrongTrendThreshold == strongTrendThreshold && cacheADXDots[idx].ShowLabel == showLabel && cacheADXDots[idx].EqualsInput(input))
 						return cacheADXDots[idx];
-			return CacheIndicator<gambcl.ADXDots>(new gambcl.ADXDots(){ Period = period, DisplayLevel = displayLevel, MediumTrendThreshold = mediumTrendThreshold, StrongTrendThreshold = strongTrendThreshold, ShowLabel = showLabel }, input, ref cacheADXDots);
+			return CacheIndicator<LunarTick.ADXDots>(new LunarTick.ADXDots(){ Period = period, DisplayLevel = displayLevel, MediumTrendThreshold = mediumTrendThreshold, StrongTrendThreshold = strongTrendThreshold, ShowLabel = showLabel }, input, ref cacheADXDots);
 		}
 	}
 }
@@ -200,12 +200,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.gambcl.ADXDots ADXDots(int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
+		public Indicators.LunarTick.ADXDots ADXDots(int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
 		{
 			return indicator.ADXDots(Input, period, displayLevel, mediumTrendThreshold, strongTrendThreshold, showLabel);
 		}
 
-		public Indicators.gambcl.ADXDots ADXDots(ISeries<double> input , int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
+		public Indicators.LunarTick.ADXDots ADXDots(ISeries<double> input , int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
 		{
 			return indicator.ADXDots(input, period, displayLevel, mediumTrendThreshold, strongTrendThreshold, showLabel);
 		}
@@ -216,12 +216,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.gambcl.ADXDots ADXDots(int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
+		public Indicators.LunarTick.ADXDots ADXDots(int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
 		{
 			return indicator.ADXDots(Input, period, displayLevel, mediumTrendThreshold, strongTrendThreshold, showLabel);
 		}
 
-		public Indicators.gambcl.ADXDots ADXDots(ISeries<double> input , int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
+		public Indicators.LunarTick.ADXDots ADXDots(ISeries<double> input , int period, int displayLevel, double mediumTrendThreshold, double strongTrendThreshold, bool showLabel)
 		{
 			return indicator.ADXDots(input, period, displayLevel, mediumTrendThreshold, strongTrendThreshold, showLabel);
 		}

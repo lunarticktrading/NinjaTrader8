@@ -10,7 +10,7 @@ using NinjaTrader.Data;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.gambcl
+namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     public class RealOpenClose : Indicator
     {
@@ -153,19 +153,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private gambcl.RealOpenClose[] cacheRealOpenClose;
-		public gambcl.RealOpenClose RealOpenClose(bool showRealOpen, bool showRealClose)
+		private LunarTick.RealOpenClose[] cacheRealOpenClose;
+		public LunarTick.RealOpenClose RealOpenClose(bool showRealOpen, bool showRealClose)
 		{
 			return RealOpenClose(Input, showRealOpen, showRealClose);
 		}
 
-		public gambcl.RealOpenClose RealOpenClose(ISeries<double> input, bool showRealOpen, bool showRealClose)
+		public LunarTick.RealOpenClose RealOpenClose(ISeries<double> input, bool showRealOpen, bool showRealClose)
 		{
 			if (cacheRealOpenClose != null)
 				for (int idx = 0; idx < cacheRealOpenClose.Length; idx++)
 					if (cacheRealOpenClose[idx] != null && cacheRealOpenClose[idx].ShowRealOpen == showRealOpen && cacheRealOpenClose[idx].ShowRealClose == showRealClose && cacheRealOpenClose[idx].EqualsInput(input))
 						return cacheRealOpenClose[idx];
-			return CacheIndicator<gambcl.RealOpenClose>(new gambcl.RealOpenClose(){ ShowRealOpen = showRealOpen, ShowRealClose = showRealClose }, input, ref cacheRealOpenClose);
+			return CacheIndicator<LunarTick.RealOpenClose>(new LunarTick.RealOpenClose(){ ShowRealOpen = showRealOpen, ShowRealClose = showRealClose }, input, ref cacheRealOpenClose);
 		}
 	}
 }
@@ -174,12 +174,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.gambcl.RealOpenClose RealOpenClose(bool showRealOpen, bool showRealClose)
+		public Indicators.LunarTick.RealOpenClose RealOpenClose(bool showRealOpen, bool showRealClose)
 		{
 			return indicator.RealOpenClose(Input, showRealOpen, showRealClose);
 		}
 
-		public Indicators.gambcl.RealOpenClose RealOpenClose(ISeries<double> input , bool showRealOpen, bool showRealClose)
+		public Indicators.LunarTick.RealOpenClose RealOpenClose(ISeries<double> input , bool showRealOpen, bool showRealClose)
 		{
 			return indicator.RealOpenClose(input, showRealOpen, showRealClose);
 		}
@@ -190,12 +190,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.gambcl.RealOpenClose RealOpenClose(bool showRealOpen, bool showRealClose)
+		public Indicators.LunarTick.RealOpenClose RealOpenClose(bool showRealOpen, bool showRealClose)
 		{
 			return indicator.RealOpenClose(Input, showRealOpen, showRealClose);
 		}
 
-		public Indicators.gambcl.RealOpenClose RealOpenClose(ISeries<double> input , bool showRealOpen, bool showRealClose)
+		public Indicators.LunarTick.RealOpenClose RealOpenClose(ISeries<double> input , bool showRealOpen, bool showRealClose)
 		{
 			return indicator.RealOpenClose(input, showRealOpen, showRealClose);
 		}
