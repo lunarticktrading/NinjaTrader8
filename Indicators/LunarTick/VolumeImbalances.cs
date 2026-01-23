@@ -4,25 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Gui.Tools;
-using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
-using Rules1;
-using NinjaTrader.NinjaScript.Indicators.gambcl.ADT;
 using System.Reflection;
-using NinjaTrader.NinjaScript.SuperDomColumns;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -69,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.0.0";
+        public const string Version = "1.1.0";
         private const int MinTicks = 1;
 
         #endregion
@@ -95,7 +82,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         public bool ShowBearish
         { get; set; }
 
-        [NinjaScriptProperty]
         [XmlIgnore]
         [Display(Name = "Bullish Color", Order = 1, GroupName = "[02] Display")]
         public Brush BullishColor
@@ -108,7 +94,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             set { BullishColor = Serialize.StringToBrush(value); }
         }
 
-        [NinjaScriptProperty]
         [XmlIgnore]
         [Display(Name = "Bearish Color", Order = 2, GroupName = "[02] Display")]
         public Brush BearishColor
@@ -121,39 +106,32 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             set { BearishColor = Serialize.StringToBrush(value); }
         }
 
-        [NinjaScriptProperty]
         [Display(Name = "Line Width", Order = 3, GroupName = "[02] Display")]
         public int LineWidth
         { get; set; }
 
-        [NinjaScriptProperty]
         [Display(Name = "Enable Alerts", Description = "Trigger alerts for detected volume imbalances.", Order = 1, GroupName = "[03] Alerts")]
         public bool EnableAlerts
         { get; set; }
 
-        [NinjaScriptProperty]
         [Display(Name = "Alert Sounds Path", Description = "Location of alert audio files.", Order = 2, GroupName = "[03] Alerts")]
         public string AlertSoundsPath
         { get; set; }
 
-        [NinjaScriptProperty]
         [Display(Name = "Bullish Volume Imbalance Alert", Description = "Alert sound used for detected bullish volume imbalance.", Order = 3, GroupName = "[03] Alerts")]
         public string BullishVolumeImbalanceAlert
         { get; set; }
 
-        [NinjaScriptProperty]
         [Display(Name = "Bearish Volume Imbalance Alert", Description = "Alert sound used for detected bearish volume imbalance.", Order = 4, GroupName = "[03] Alerts")]
         public string BearishVolumeImbalanceAlert
         { get; set; }
 
-        [NinjaScriptProperty]
         [ReadOnly(true)]
         [XmlIgnore]
         [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "[04] Developer")]
         public string VersionInformation
         { get; set; }
 
-        [NinjaScriptProperty]
         [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "[04] Developer")]
         public bool Debug
         { get; set; }
@@ -180,7 +158,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 				ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
                 //Disable this property if your indicator requires custom values that cumulate with each new market data event. 
                 //See Help Guide for additional information.
-                ShowBullish = true;
+                ShowBullish                                 = true;
                 ShowBearish                                 = true;
                 BullishColor                                = Brushes.Aqua;
                 BearishColor								= Brushes.Fuchsia;
@@ -251,14 +229,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
 				if (volumeImbalance == null)
 				{
-                    DebugPrint($"New bullish VolumeImbalance detected at {Time[0].ToString("O")}");
+                    DebugPrint($"Detected bullish VolumeImbalance at {Time[0].ToString("O")}");
                     volumeImbalance = new VolumeImbalance(CurrentBar, Direction.Bullish, currOpen, prevClose);
 					_unfilled.Add(volumeImbalance);
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BullishVolumeImbalanceAlert))
                     {
                         string audioFile = ResolveAlertFilePath(BullishVolumeImbalanceAlert, AlertSoundsPath);
-                        Alert("BullishVolumeImbalanceAlert", Priority.High, string.Format("New bullish volume imbalance detected {0:0.##}", currOpen), audioFile, 10, Brushes.Black, BullishColor);
+                        Alert("BullishVolumeImbalanceAlert", Priority.High, string.Format("Detected bullish volume imbalance {0:0.##}", currOpen), audioFile, 10, Brushes.Black, BullishColor);
                     }
                 }
 			}
@@ -269,14 +247,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
                 if (volumeImbalance == null)
                 {
-                    DebugPrint($"New bearish VolumeImbalance detected at {Time[0].ToString("O")}");
+                    DebugPrint($"Detected bearish VolumeImbalance at {Time[0].ToString("O")}");
                     volumeImbalance = new VolumeImbalance(CurrentBar, Direction.Bearish, prevClose, currOpen);
                     _unfilled.Add(volumeImbalance);
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BearishVolumeImbalanceAlert))
                     {
                         string audioFile = ResolveAlertFilePath(BearishVolumeImbalanceAlert, AlertSoundsPath);
-                        Alert("BearishVolumeImbalanceAlert", Priority.High, string.Format("New bearish volume imbalance detected {0:0.##}", currOpen), audioFile, 10, Brushes.Black, BearishColor);
+                        Alert("BearishVolumeImbalanceAlert", Priority.High, string.Format("Detected bearish volume imbalance {0:0.##}", currOpen), audioFile, 10, Brushes.Black, BearishColor);
                     }
                 }
             }
@@ -329,7 +307,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 				int barsAgo = CurrentBar - volumeImbalance.StartBarIndex;
 
                 volumeImbalance.DotTag = $"VolumeImbalanceDot{volumeImbalance.StartBarIndex}";
-				Draw.Dot(this, volumeImbalance.DotTag, false, barsAgo, volumeImbalance.Direction == Direction.Bullish ? Low[barsAgo] : High[barsAgo], volumeImbalance.Direction == Direction.Bullish ? BullishColor : BearishColor);
+				Draw.Dot(this, volumeImbalance.DotTag, false, barsAgo, volumeImbalance.Direction == Direction.Bullish ? (Low[barsAgo] - TickSize) : (High[barsAgo] + TickSize), volumeImbalance.Direction == Direction.Bullish ? BullishColor : BearishColor);
 
                 volumeImbalance.LineTag = $"VolumeImbalanceLine{volumeImbalance.StartBarIndex}";
 				var lineY = volumeImbalance.Direction == Direction.Bullish ? volumeImbalance.High : volumeImbalance.Low;
@@ -372,18 +350,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private LunarTick.VolumeImbalances[] cacheVolumeImbalances;
-		public LunarTick.VolumeImbalances VolumeImbalances(bool showBullish, bool showBearish, Brush bullishColor, Brush bearishColor, int lineWidth, bool enableAlerts, string alertSoundsPath, string bullishVolumeImbalanceAlert, string bearishVolumeImbalanceAlert, string versionInformation, bool debug)
+		public LunarTick.VolumeImbalances VolumeImbalances(bool showBullish, bool showBearish)
 		{
-			return VolumeImbalances(Input, showBullish, showBearish, bullishColor, bearishColor, lineWidth, enableAlerts, alertSoundsPath, bullishVolumeImbalanceAlert, bearishVolumeImbalanceAlert, versionInformation, debug);
+			return VolumeImbalances(Input, showBullish, showBearish);
 		}
 
-		public LunarTick.VolumeImbalances VolumeImbalances(ISeries<double> input, bool showBullish, bool showBearish, Brush bullishColor, Brush bearishColor, int lineWidth, bool enableAlerts, string alertSoundsPath, string bullishVolumeImbalanceAlert, string bearishVolumeImbalanceAlert, string versionInformation, bool debug)
+		public LunarTick.VolumeImbalances VolumeImbalances(ISeries<double> input, bool showBullish, bool showBearish)
 		{
 			if (cacheVolumeImbalances != null)
 				for (int idx = 0; idx < cacheVolumeImbalances.Length; idx++)
-					if (cacheVolumeImbalances[idx] != null && cacheVolumeImbalances[idx].ShowBullish == showBullish && cacheVolumeImbalances[idx].ShowBearish == showBearish && cacheVolumeImbalances[idx].BullishColor == bullishColor && cacheVolumeImbalances[idx].BearishColor == bearishColor && cacheVolumeImbalances[idx].LineWidth == lineWidth && cacheVolumeImbalances[idx].EnableAlerts == enableAlerts && cacheVolumeImbalances[idx].AlertSoundsPath == alertSoundsPath && cacheVolumeImbalances[idx].BullishVolumeImbalanceAlert == bullishVolumeImbalanceAlert && cacheVolumeImbalances[idx].BearishVolumeImbalanceAlert == bearishVolumeImbalanceAlert && cacheVolumeImbalances[idx].VersionInformation == versionInformation && cacheVolumeImbalances[idx].Debug == debug && cacheVolumeImbalances[idx].EqualsInput(input))
+					if (cacheVolumeImbalances[idx] != null && cacheVolumeImbalances[idx].ShowBullish == showBullish && cacheVolumeImbalances[idx].ShowBearish == showBearish && cacheVolumeImbalances[idx].EqualsInput(input))
 						return cacheVolumeImbalances[idx];
-			return CacheIndicator<LunarTick.VolumeImbalances>(new LunarTick.VolumeImbalances(){ ShowBullish = showBullish, ShowBearish = showBearish, BullishColor = bullishColor, BearishColor = bearishColor, LineWidth = lineWidth, EnableAlerts = enableAlerts, AlertSoundsPath = alertSoundsPath, BullishVolumeImbalanceAlert = bullishVolumeImbalanceAlert, BearishVolumeImbalanceAlert = bearishVolumeImbalanceAlert, VersionInformation = versionInformation, Debug = debug }, input, ref cacheVolumeImbalances);
+			return CacheIndicator<LunarTick.VolumeImbalances>(new LunarTick.VolumeImbalances(){ ShowBullish = showBullish, ShowBearish = showBearish }, input, ref cacheVolumeImbalances);
 		}
 	}
 }
@@ -392,14 +370,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(bool showBullish, bool showBearish, Brush bullishColor, Brush bearishColor, int lineWidth, bool enableAlerts, string alertSoundsPath, string bullishVolumeImbalanceAlert, string bearishVolumeImbalanceAlert, string versionInformation, bool debug)
+		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(bool showBullish, bool showBearish)
 		{
-			return indicator.VolumeImbalances(Input, showBullish, showBearish, bullishColor, bearishColor, lineWidth, enableAlerts, alertSoundsPath, bullishVolumeImbalanceAlert, bearishVolumeImbalanceAlert, versionInformation, debug);
+			return indicator.VolumeImbalances(Input, showBullish, showBearish);
 		}
 
-		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(ISeries<double> input , bool showBullish, bool showBearish, Brush bullishColor, Brush bearishColor, int lineWidth, bool enableAlerts, string alertSoundsPath, string bullishVolumeImbalanceAlert, string bearishVolumeImbalanceAlert, string versionInformation, bool debug)
+		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(ISeries<double> input , bool showBullish, bool showBearish)
 		{
-			return indicator.VolumeImbalances(input, showBullish, showBearish, bullishColor, bearishColor, lineWidth, enableAlerts, alertSoundsPath, bullishVolumeImbalanceAlert, bearishVolumeImbalanceAlert, versionInformation, debug);
+			return indicator.VolumeImbalances(input, showBullish, showBearish);
 		}
 	}
 }
@@ -408,14 +386,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(bool showBullish, bool showBearish, Brush bullishColor, Brush bearishColor, int lineWidth, bool enableAlerts, string alertSoundsPath, string bullishVolumeImbalanceAlert, string bearishVolumeImbalanceAlert, string versionInformation, bool debug)
+		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(bool showBullish, bool showBearish)
 		{
-			return indicator.VolumeImbalances(Input, showBullish, showBearish, bullishColor, bearishColor, lineWidth, enableAlerts, alertSoundsPath, bullishVolumeImbalanceAlert, bearishVolumeImbalanceAlert, versionInformation, debug);
+			return indicator.VolumeImbalances(Input, showBullish, showBearish);
 		}
 
-		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(ISeries<double> input , bool showBullish, bool showBearish, Brush bullishColor, Brush bearishColor, int lineWidth, bool enableAlerts, string alertSoundsPath, string bullishVolumeImbalanceAlert, string bearishVolumeImbalanceAlert, string versionInformation, bool debug)
+		public Indicators.LunarTick.VolumeImbalances VolumeImbalances(ISeries<double> input , bool showBullish, bool showBearish)
 		{
-			return indicator.VolumeImbalances(input, showBullish, showBearish, bullishColor, bearishColor, lineWidth, enableAlerts, alertSoundsPath, bullishVolumeImbalanceAlert, bearishVolumeImbalanceAlert, versionInformation, debug);
+			return indicator.VolumeImbalances(input, showBullish, showBearish);
 		}
 	}
 }
