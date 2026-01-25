@@ -29,3 +29,4 @@ Strategies/*
 !Templates/Chart/*
 !Templates/Indicator
 !Templates/Indicator/*
+!Templates/Indicator/*/*
