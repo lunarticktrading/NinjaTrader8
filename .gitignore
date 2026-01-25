@@ -25,3 +25,7 @@ Strategies/*
 
 !Templates
 !Templates/*
+!Templates/Chart
+!Templates/Chart/*
+!Templates/Indicator
+!Templates/Indicator/*
