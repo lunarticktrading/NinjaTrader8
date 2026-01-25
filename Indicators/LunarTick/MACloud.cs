@@ -39,7 +39,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
             {
                 Description									= @"Bullish/bearish cloud based on two moving averages.";
-                Name										= "MACloud";
+                Name										= "MA Cloud";
                 Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= true;
                 DisplayInDataBox							= true;

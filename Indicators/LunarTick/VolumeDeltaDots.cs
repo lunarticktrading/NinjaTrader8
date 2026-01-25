@@ -26,7 +26,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 			if (State == State.SetDefaults)
 			{
 				Description									= @"Indicator showing the Volume Delta direction.";
-				Name										= "VolumeDeltaDots";
+				Name										= "VolumeDelta Dots";
 				Calculate									= Calculate.OnEachTick;
 				IsOverlay									= false;
 				DisplayInDataBox							= false;

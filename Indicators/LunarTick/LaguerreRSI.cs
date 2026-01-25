@@ -42,7 +42,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
             {
                 Description									= @"Laguerre RSI.";
-                Name										= "LaguerreRSI";
+                Name										= "Laguerre RSI";
                 Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= false;
                 DisplayInDataBox							= true;

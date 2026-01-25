@@ -25,7 +25,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
             {
                 Description									= @"Row of colored dots indicating ADX strength.";
-                Name										= "ADXDots";
+                Name										= "ADX Dots";
                 Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= false;
                 DisplayInDataBox							= false;

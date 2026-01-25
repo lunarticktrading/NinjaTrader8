@@ -35,7 +35,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
             {
                 Description									= @"Moving Average that generates signals when price crosses and closes beyond the Moving Average.";
-                Name										= "SignalsMA";
+                Name										= "Signals MA";
                 Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= true;
                 DisplayInDataBox							= true;

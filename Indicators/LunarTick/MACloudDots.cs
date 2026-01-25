@@ -26,7 +26,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 			if (State == State.SetDefaults)
 			{
 				Description									= @"Indicator showing the MA Cloud trend.";
-				Name										= "MACloudDots";
+				Name										= "MA Cloud Dots";
 				Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= false;
                 DisplayInDataBox							= false;

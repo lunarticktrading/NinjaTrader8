@@ -25,7 +25,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
             {
                 Description									= @"Shows the real Open and Close levels for candles.";
-                Name										= "RealOpenClose";
+                Name										= "Real Open/Close";
                 Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= true;
                 DisplayInDataBox							= true;

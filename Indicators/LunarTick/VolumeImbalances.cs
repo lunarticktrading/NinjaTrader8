@@ -147,7 +147,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
 			{
 				Description									= @"Highlights volume imbalances, by looking for a gap between a candle's close and the following candle's open.";
-				Name										= "VolumeImbalances";
+				Name										= "Volume Imbalances";
 				Calculate									= Calculate.OnPriceChange;
 				IsOverlay									= true;
 				DisplayInDataBox							= true;

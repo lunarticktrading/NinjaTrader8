@@ -24,7 +24,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (State == State.SetDefaults)
             {
                 Description									= @"Indicator showing changes in Heiken Ashi trend.";
-                Name										= "HeikenAshiDots";
+                Name										= "HeikenAshi Dots";
                 Calculate									= Calculate.OnPriceChange;
                 IsOverlay									= false;
                 DisplayInDataBox							= false;
