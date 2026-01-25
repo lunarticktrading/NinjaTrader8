@@ -1,25 +1,14 @@
 #region Using declarations
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
-using System.Diagnostics;
 using System.Reflection;
 #endregion
 
@@ -28,18 +17,20 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     [Gui.CategoryOrder("[01] Parameters", 1)]
     [Gui.CategoryOrder("[02] Display", 2)]
-    [Gui.CategoryOrder("[03] Developer", 3)]
+    [Gui.CategoryOrder("[03] Bars", 3)]
+    [Gui.CategoryOrder("[04] Developer", 4)]
     [TypeConverter("NinjaTrader.NinjaScript.Indicators.LunarTick.VWAPDeluxeTypeConverter")]
     public class VWAPDeluxe : Indicator
-	{
+    {
         #region Constants
 
-        public const string Version = "1.0.0";
+        public const string Version = "1.1.0";
 
         #endregion
 
         #region Members
-		
+
+        NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations _numStandardDeviations = VWAPStandardDeviations.None;
         OrderFlowVWAP? _orderFlowVWAP = null;
 
         #endregion
@@ -65,7 +56,21 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         [NinjaScriptProperty]
         [Display(Name = "Std Dev bands", Order = 4, GroupName = "[01] Parameters")]
         public NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations NumStandardDeviations
-        { get; set; }
+        {
+            get => _numStandardDeviations;
+
+            set
+            {
+                _numStandardDeviations = value;
+                if (_numStandardDeviations == VWAPStandardDeviations.None)
+                {
+                    // Disable options that require at least one StdDev band.
+                    HighlightBarsInBalanceRegion = false;
+                    HighlightBarsInBullishImbalanceRegion = false;
+                    HighlightBarsInBearishImbalanceRegion = false;
+                }
+            }
+        }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
@@ -216,13 +221,129 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             set { BelowPriceColor = Serialize.StringToBrush(value); }
         }
 
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Highlight bars in balance region", Description = "Highlight the bars closing inside the +1/-1 Std Deviation bands.", Order = 1, GroupName = "[03] Bars")]
+        public bool HighlightBarsInBalanceRegion
+        { get; set; }
+
+        [XmlIgnore]
+        [Display(Name = "Balance region up bars", Order = 2, GroupName = "[03] Bars")]
+        public Brush BalanceRegionUpBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BalanceRegionUpBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BalanceRegionUpBarsColor); }
+            set { BalanceRegionUpBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [XmlIgnore]
+        [Display(Name = "Balance region down bars", Order = 3, GroupName = "[03] Bars")]
+        public Brush BalanceRegionDownBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BalanceRegionDownBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BalanceRegionDownBarsColor); }
+            set { BalanceRegionDownBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Highlight bars in bullish imbalance region", Description = "Highlight the bars closing above the +1 Std Deviation band.", Order = 4, GroupName = "[03] Bars")]
+        public bool HighlightBarsInBullishImbalanceRegion
+        { get; set; }
+
+        [XmlIgnore]
+        [Display(Name = "Bullish imbalance region up bars", Order = 5, GroupName = "[03] Bars")]
+        public Brush BullishImbalanceRegionUpBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BullishImbalanceRegionUpBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BullishImbalanceRegionUpBarsColor); }
+            set { BullishImbalanceRegionUpBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [XmlIgnore]
+        [Display(Name = "Bullish imbalance region down bars", Order = 6, GroupName = "[03] Bars")]
+        public Brush BullishImbalanceRegionDownBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BullishImbalanceRegionDownBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BullishImbalanceRegionDownBarsColor); }
+            set { BullishImbalanceRegionDownBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Highlight bars in bearish imbalance region", Description = "Highlight the bars closing below the -1 Std Deviation band.", Order = 7, GroupName = "[03] Bars")]
+        public bool HighlightBarsInBearishImbalanceRegion
+        { get; set; }
+
+        [XmlIgnore]
+        [Display(Name = "Bearish imbalance region up bars", Order = 8, GroupName = "[03] Bars")]
+        public Brush BearishImbalanceRegionUpBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BearishImbalanceRegionUpBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BearishImbalanceRegionUpBarsColor); }
+            set { BearishImbalanceRegionUpBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [XmlIgnore]
+        [Display(Name = "Bearish imbalance region down bars", Order = 9, GroupName = "[03] Bars")]
+        public Brush BearishImbalanceRegionDownBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BearishImbalanceRegionDownBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BearishImbalanceRegionDownBarsColor); }
+            set { BearishImbalanceRegionDownBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Highlight bar/VWAP interactions", Description = "Highlight the bars touching VWAP or any Std Deviation band.", Order = 10, GroupName = "[03] Bars")]
+        public bool HighlightBarVWAPInteractions
+        { get; set; }
+
+        [XmlIgnore]
+        [Display(Name = "Bar/VWAP interaction up bars", Order = 11, GroupName = "[03] Bars")]
+        public Brush BarVWAPInteractionUpBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BarVWAPInteractionUpBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BarVWAPInteractionUpBarsColor); }
+            set { BarVWAPInteractionUpBarsColor = Serialize.StringToBrush(value); }
+        }
+
+        [XmlIgnore]
+        [Display(Name = "Bar/VWAP interaction down bars", Order = 12, GroupName = "[03] Bars")]
+        public Brush BarVWAPInteractionDownBarsColor
+        { get; set; }
+
+        [Browsable(false)]
+        public string BarVWAPInteractionDownBarsColorSerializable
+        {
+            get { return Serialize.BrushToString(BarVWAPInteractionDownBarsColor); }
+            set { BarVWAPInteractionDownBarsColor = Serialize.StringToBrush(value); }
+        }
+
         [ReadOnly(true)]
         [XmlIgnore]
-        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "[03] Developer")]
+        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "[04] Developer")]
         public string VersionInformation
         { get; set; }
 
-        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "[03] Developer")]
+        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "[04] Developer")]
         public bool Debug
         { get; set; }
 
@@ -325,6 +446,22 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 AbovePriceColor                             = Brushes.Red;
                 BelowPriceColor                             = Brushes.LimeGreen;
 
+                HighlightBarsInBalanceRegion                = false;
+                BalanceRegionUpBarsColor                    = Brushes.LightGray;
+                BalanceRegionDownBarsColor                  = Brushes.DimGray;
+
+                HighlightBarsInBullishImbalanceRegion       = false;
+                BullishImbalanceRegionUpBarsColor           = Brushes.LimeGreen;
+                BullishImbalanceRegionDownBarsColor         = Brushes.DarkGreen;
+
+                HighlightBarsInBearishImbalanceRegion       = false;
+                BearishImbalanceRegionUpBarsColor           = Brushes.Red;
+                BearishImbalanceRegionDownBarsColor         = Brushes.DarkRed;
+
+                HighlightBarVWAPInteractions                = false;
+                BarVWAPInteractionUpBarsColor               = Brushes.Yellow;
+                BarVWAPInteractionDownBarsColor             = Brushes.Goldenrod;
+
                 VersionInformation                          = $"{Version} - {Assembly.GetAssembly(typeof(VWAPDeluxe)).GetName().Version}";
                 Debug										= false;
 
@@ -423,6 +560,54 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     if (StdDev3LowerAreaOpacity > 0)
                     {
                         Draw.Region(this, "StdDev3LowerRegion", CurrentBar, 0, StdDev3Lower, StdDev2Lower, null, StdDev3LowerAreaColor, StdDev3LowerAreaOpacity);
+                    }
+                }
+
+                // Region bar colors (requires at least 1 StdDev).
+                if ((NumStandardDeviations != VWAPStandardDeviations.None) && (HighlightBarsInBalanceRegion || HighlightBarsInBullishImbalanceRegion || HighlightBarsInBearishImbalanceRegion))
+                {
+                    if (HighlightBarsInBullishImbalanceRegion && (Close[0] > _orderFlowVWAP.StdDev1Upper[0]))
+                    {
+                        BarBrushes[0] = (Close[0] > Open[0]) ? BullishImbalanceRegionUpBarsColor : BullishImbalanceRegionDownBarsColor;
+                    }
+                    else if (HighlightBarsInBearishImbalanceRegion && (Close[0] < _orderFlowVWAP.StdDev1Lower[0]))
+                    {
+                        BarBrushes[0] = (Close[0] > Open[0]) ? BearishImbalanceRegionUpBarsColor : BearishImbalanceRegionDownBarsColor;
+                    }
+                    else if (HighlightBarsInBalanceRegion && (Close[0] <= _orderFlowVWAP.StdDev1Upper[0]) && (Close[0] >= _orderFlowVWAP.StdDev1Lower[0]))
+                    {
+                        BarBrushes[0] = (Close[0] > Open[0]) ? BalanceRegionUpBarsColor : BalanceRegionDownBarsColor;
+                    }
+                }
+                if (HighlightBarVWAPInteractions)
+                {
+                    bool checkStdDev1 = NumStandardDeviations != VWAPStandardDeviations.None;
+                    bool checkStdDev2 = NumStandardDeviations == VWAPStandardDeviations.Two || NumStandardDeviations == VWAPStandardDeviations.Three;
+                    bool checkStdDev3 = NumStandardDeviations == VWAPStandardDeviations.Three;
+                    bool barVWAPInteraction = false;
+
+
+                    if (!barVWAPInteraction && _orderFlowVWAP.VWAP[0] <= High[0] && _orderFlowVWAP.VWAP[0] >= Low[0])
+                        barVWAPInteraction = true;
+
+                    if (!barVWAPInteraction && checkStdDev1 && _orderFlowVWAP.StdDev1Upper[0] <= High[0] && _orderFlowVWAP.StdDev1Upper[0] >= Low[0])
+                        barVWAPInteraction = true;
+                    if (!barVWAPInteraction && checkStdDev1 && _orderFlowVWAP.StdDev1Lower[0] <= High[0] && _orderFlowVWAP.StdDev1Lower[0] >= Low[0])
+                        barVWAPInteraction = true;
+
+                    if (!barVWAPInteraction && checkStdDev2 && _orderFlowVWAP.StdDev2Upper[0] <= High[0] && _orderFlowVWAP.StdDev2Upper[0] >= Low[0])
+                        barVWAPInteraction = true;
+                    if (!barVWAPInteraction && checkStdDev2 && _orderFlowVWAP.StdDev2Lower[0] <= High[0] && _orderFlowVWAP.StdDev2Lower[0] >= Low[0])
+                        barVWAPInteraction = true;
+
+                    if (!barVWAPInteraction && checkStdDev3 && _orderFlowVWAP.StdDev3Upper[0] <= High[0] && _orderFlowVWAP.StdDev3Upper[0] >= Low[0])
+                        barVWAPInteraction = true;
+                    if (!barVWAPInteraction && checkStdDev3 && _orderFlowVWAP.StdDev3Lower[0] <= High[0] && _orderFlowVWAP.StdDev3Lower[0] >= Low[0])
+                        barVWAPInteraction = true;
+
+                    if (barVWAPInteraction)
+                    {
+                        BarBrushes[0] = (Close[0] > Open[0]) ? BarVWAPInteractionUpBarsColor : BarVWAPInteractionDownBarsColor;
                     }
                 }
             }
@@ -564,11 +749,154 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 propertyDescriptorCollection.Add(belowPriceColorPropertyDesc);
             }
 
+
+            // Enable/disable some HighlightBars checkboxes if no StdDev bands are showing. 
+            PropertyDescriptor highlightBarsInBalanceRegionPropertyDesc = propertyDescriptorCollection["HighlightBarsInBalanceRegion"];
+            PropertyDescriptor highlightBarsInBullishImbalanceRegionPropertyDesc = propertyDescriptorCollection["HighlightBarsInBullishImbalanceRegion"];
+            PropertyDescriptor highlightBarsInBearishImbalanceRegionPropertyDesc = propertyDescriptorCollection["HighlightBarsInBearishImbalanceRegion"];
+            propertyDescriptorCollection.Remove(highlightBarsInBalanceRegionPropertyDesc);
+            propertyDescriptorCollection.Remove(highlightBarsInBullishImbalanceRegionPropertyDesc);
+            propertyDescriptorCollection.Remove(highlightBarsInBearishImbalanceRegionPropertyDesc);
+            highlightBarsInBalanceRegionPropertyDesc = new BoolRequiringStdDeviationsPropertyDescriptor(indicator, highlightBarsInBalanceRegionPropertyDesc);
+            highlightBarsInBullishImbalanceRegionPropertyDesc = new BoolRequiringStdDeviationsPropertyDescriptor(indicator, highlightBarsInBullishImbalanceRegionPropertyDesc);
+            highlightBarsInBearishImbalanceRegionPropertyDesc = new BoolRequiringStdDeviationsPropertyDescriptor(indicator, highlightBarsInBearishImbalanceRegionPropertyDesc);
+            propertyDescriptorCollection.Add(highlightBarsInBalanceRegionPropertyDesc);
+            propertyDescriptorCollection.Add(highlightBarsInBullishImbalanceRegionPropertyDesc);
+            propertyDescriptorCollection.Add(highlightBarsInBearishImbalanceRegionPropertyDesc);
+
+
+            // Show/hide properties related to HighlightBarsInBalanceRegion
+            PropertyDescriptor balanceRegionUpBarsColorPropertyDesc = propertyDescriptorCollection["BalanceRegionUpBarsColor"];
+            PropertyDescriptor balanceRegionDownBarsColorPropertyDesc = propertyDescriptorCollection["BalanceRegionDownBarsColor"];
+            propertyDescriptorCollection.Remove(balanceRegionUpBarsColorPropertyDesc);
+            propertyDescriptorCollection.Remove(balanceRegionDownBarsColorPropertyDesc);
+            if (indicator.HighlightBarsInBalanceRegion)
+            {
+                propertyDescriptorCollection.Add(balanceRegionUpBarsColorPropertyDesc);
+                propertyDescriptorCollection.Add(balanceRegionDownBarsColorPropertyDesc);
+            }
+
+
+            // Show/hide properties related to HighlightBarsInBullishImbalanceRegion
+            PropertyDescriptor bullishImbalanceRegionUpBarsColorPropertyDesc = propertyDescriptorCollection["BullishImbalanceRegionUpBarsColor"];
+            PropertyDescriptor bullishImbalanceRegionDownBarsColorPropertyDesc = propertyDescriptorCollection["BullishImbalanceRegionDownBarsColor"];
+            propertyDescriptorCollection.Remove(bullishImbalanceRegionUpBarsColorPropertyDesc);
+            propertyDescriptorCollection.Remove(bullishImbalanceRegionDownBarsColorPropertyDesc);
+            if (indicator.HighlightBarsInBullishImbalanceRegion)
+            {
+                propertyDescriptorCollection.Add(bullishImbalanceRegionUpBarsColorPropertyDesc);
+                propertyDescriptorCollection.Add(bullishImbalanceRegionDownBarsColorPropertyDesc);
+            }
+
+
+            // Show/hide properties related to HighlightBarsInBearishImbalanceRegion
+            PropertyDescriptor bearishImbalanceRegionUpBarsColorPropertyDesc = propertyDescriptorCollection["BearishImbalanceRegionUpBarsColor"];
+            PropertyDescriptor bearishImbalanceRegionDownBarsColorPropertyDesc = propertyDescriptorCollection["BearishImbalanceRegionDownBarsColor"];
+            propertyDescriptorCollection.Remove(bearishImbalanceRegionUpBarsColorPropertyDesc);
+            propertyDescriptorCollection.Remove(bearishImbalanceRegionDownBarsColorPropertyDesc);
+            if (indicator.HighlightBarsInBearishImbalanceRegion)
+            {
+                propertyDescriptorCollection.Add(bearishImbalanceRegionUpBarsColorPropertyDesc);
+                propertyDescriptorCollection.Add(bearishImbalanceRegionDownBarsColorPropertyDesc);
+            }
+
+
+            // Show/hide properties related to HighlightBarVWAPInteractions
+            PropertyDescriptor barVWAPInteractionUpBarsColorPropertyDesc = propertyDescriptorCollection["BarVWAPInteractionUpBarsColor"];
+            PropertyDescriptor barVWAPInteractionDownBarsColorPropertyDesc = propertyDescriptorCollection["BarVWAPInteractionDownBarsColor"];
+            propertyDescriptorCollection.Remove(barVWAPInteractionUpBarsColorPropertyDesc);
+            propertyDescriptorCollection.Remove(barVWAPInteractionDownBarsColorPropertyDesc);
+            if (indicator.HighlightBarVWAPInteractions)
+            {
+                propertyDescriptorCollection.Add(barVWAPInteractionUpBarsColorPropertyDesc);
+                propertyDescriptorCollection.Add(barVWAPInteractionDownBarsColorPropertyDesc);
+            }
+
             return propertyDescriptorCollection;
         }
 
         // Important: This must return true otherwise the type convetor will not be called
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
+        { return true; }
+    }
+
+    public class BoolRequiringStdDeviationsPropertyDescriptor : PropertyDescriptor
+    {
+        // Need the instance on the property grid to check the show/hide toggle value
+        private VWAPDeluxe indicatorInstance;
+
+        private PropertyDescriptor property;
+
+        // The base instance constructor helps store the default Name and Attributes (Such as DisplayAttribute.Name, .GroupName, .Order)
+        // Otherwise those details would be lost when we converted the PropertyDescriptor to the new custom ReadOnlyDescriptor
+        public BoolRequiringStdDeviationsPropertyDescriptor(VWAPDeluxe indicator, PropertyDescriptor propertyDescriptor) : base(propertyDescriptor.Name, propertyDescriptor.Attributes.OfType<Attribute>().ToArray())
+        {
+            indicatorInstance = indicator;
+            property = propertyDescriptor;
+        }
+
+        // Stores the current value of the property on the indicator
+        public override object GetValue(object component)
+        {
+            VWAPDeluxe targetInstance = component as VWAPDeluxe;
+
+            if (targetInstance == null)
+                return null;
+
+            switch (property.Name)
+            {
+                case "HighlightBarsInBalanceRegion":
+                    return targetInstance.HighlightBarsInBalanceRegion;
+                case "HighlightBarsInBullishImbalanceRegion":
+                    return targetInstance.HighlightBarsInBullishImbalanceRegion;
+                case "HighlightBarsInBearishImbalanceRegion":
+                    return targetInstance.HighlightBarsInBearishImbalanceRegion;
+            }
+            return null;
+        }
+
+        // Updates the current value of the property on the indicator
+        public override void SetValue(object component, object value)
+        {
+            VWAPDeluxe targetInstance = component as VWAPDeluxe;
+
+            if (targetInstance == null)
+                return;
+
+            switch (property.Name)
+            {
+                case "HighlightBarsInBalanceRegion":
+                    targetInstance.HighlightBarsInBalanceRegion = (bool)value;
+                    break;
+                case "HighlightBarsInBullishImbalanceRegion":
+                    targetInstance.HighlightBarsInBullishImbalanceRegion = (bool)value;
+                    break;
+                case "HighlightBarsInBearishImbalanceRegion":
+                    targetInstance.HighlightBarsInBearishImbalanceRegion = (bool)value;
+                    break;
+            }
+        }
+
+        // set the PropertyDescriptor to "read only" based on the indicator instance input
+        public override bool IsReadOnly
+        { get { return indicatorInstance.NumStandardDeviations == VWAPStandardDeviations.None; } }
+
+        // IsReadOnly is the relevant interface member we need to use to obtain our desired custom behavior
+        // but applying a custom property descriptor requires having to handle a bunch of other operations as well.
+        // I.e., the below methods and properties are required to be implemented, otherwise it won't compile.
+        public override bool CanResetValue(object component)
+        { return true; }
+
+        public override Type ComponentType
+        { get { return typeof(VWAPDeluxeTypeConverter); } }
+
+        public override Type PropertyType
+        { get { return typeof(bool); } }
+
+        public override void ResetValue(object component)
+        { }
+
+        public override bool ShouldSerializeValue(object component)
         { return true; }
     }
 }
