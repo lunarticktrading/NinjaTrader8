@@ -21,7 +21,7 @@
       <Calculate>OnPriceChange</Calculate>
       <Displacement>0</Displacement>
       <DisplayInDataBox>true</DisplayInDataBox>
-      <From>2026-01-19T00:00:00</From>
+      <From>2026-01-21T00:00:00</From>
       <IsAutoScale>false</IsAutoScale>
       <Lines />
       <MaximumBarsLookBack>TwoHundredFiftySix</MaximumBarsLookBack>
@@ -115,7 +115,7 @@
       </Plots>
       <ScaleJustification>Right</ScaleJustification>
       <ShowTransparentPlotsInDataBox>false</ShowTransparentPlotsInDataBox>
-      <To>2026-01-24T00:00:00</To>
+      <To>2026-01-26T00:00:00</To>
       <IsDataSeriesRequired>true</IsDataSeriesRequired>
       <IsOverlay>true</IsOverlay>
       <SelectedValueSeries>0</SelectedValueSeries>
@@ -126,7 +126,7 @@
       <DrawVerticalGridLines>true</DrawVerticalGridLines>
       <DrawOnPricePanel>true</DrawOnPricePanel>
       <ChartHashCodeDeserialized>0</ChartHashCodeDeserialized>
-      <IndicatorId>6996</IndicatorId>
+      <IndicatorId>317</IndicatorId>
       <MaxSerialized>0</MaxSerialized>
       <MinSerialized>0</MinSerialized>
       <ZOrder>10038</ZOrder>
@@ -141,9 +141,9 @@
       <StdDev1LowerAreaColorSerializable>&lt;SolidColorBrush xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"&gt;#FF6495ED&lt;/SolidColorBrush&gt;</StdDev1LowerAreaColorSerializable>
       <StdDev1LowerAreaOpacity>0</StdDev1LowerAreaOpacity>
       <StdDev2UpperAreaColorSerializable>&lt;SolidColorBrush xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"&gt;#FFFF0000&lt;/SolidColorBrush&gt;</StdDev2UpperAreaColorSerializable>
-      <StdDev2UpperAreaOpacity>30</StdDev2UpperAreaOpacity>
+      <StdDev2UpperAreaOpacity>10</StdDev2UpperAreaOpacity>
       <StdDev2LowerAreaColorSerializable>&lt;SolidColorBrush xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"&gt;#FF32CD32&lt;/SolidColorBrush&gt;</StdDev2LowerAreaColorSerializable>
-      <StdDev2LowerAreaOpacity>30</StdDev2LowerAreaOpacity>
+      <StdDev2LowerAreaOpacity>10</StdDev2LowerAreaOpacity>
       <StdDev3UpperAreaColorSerializable>&lt;SolidColorBrush xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"&gt;#FF6495ED&lt;/SolidColorBrush&gt;</StdDev3UpperAreaColorSerializable>
       <StdDev3UpperAreaOpacity>30</StdDev3UpperAreaOpacity>
       <StdDev3LowerAreaColorSerializable>&lt;SolidColorBrush xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"&gt;#FF6495ED&lt;/SolidColorBrush&gt;</StdDev3LowerAreaColorSerializable>

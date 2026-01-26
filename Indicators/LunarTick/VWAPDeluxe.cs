@@ -24,7 +24,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
     {
         #region Constants
 
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
 
         #endregion
 
@@ -47,14 +47,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         public NinjaTrader.NinjaScript.Indicators.VWAPResolution Resolution
         { get; set; }
 
-        [NinjaScriptProperty]
-        [Display(Name = "Trading hours", Order = 3, GroupName = "[01] Parameters")]
-        public Data.TradingHours TradingHours
-        { get; set; }
-
         [RefreshProperties(RefreshProperties.All)]
         [NinjaScriptProperty]
-        [Display(Name = "Std Dev bands", Order = 4, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev bands", Order = 3, GroupName = "[01] Parameters")]
         public NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations NumStandardDeviations
         {
             get => _numStandardDeviations;
@@ -74,19 +69,19 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Std Dev 1 multiplier", Order = 5, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev 1 multiplier", Order = 4, GroupName = "[01] Parameters")]
         public double StdDev1Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Std Dev 2 multiplier", Order = 6, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev 2 multiplier", Order = 5, GroupName = "[01] Parameters")]
         public double StdDev2Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Std Dev 3 multiplier", Order = 7, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev 3 multiplier", Order = 6, GroupName = "[01] Parameters")]
         public double StdDev3Multiplier
         { get; set; }
 
@@ -222,7 +217,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bars in balance region", Description = "Highlight the bars closing inside the +1/-1 Std Deviation bands.", Order = 1, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bars in balance region", Description = "Highlight the bars closing inside the Std Deviation 1 bands.", Order = 1, GroupName = "[03] Bars")]
         public bool HighlightBarsInBalanceRegion
         { get; set; }
 
@@ -251,7 +246,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bars in bullish imbalance region", Description = "Highlight the bars closing above the +1 Std Deviation band.", Order = 4, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bars in bullish imbalance region", Description = "Highlight the bars closing above the Std Deviation 1 Upper band.", Order = 4, GroupName = "[03] Bars")]
         public bool HighlightBarsInBullishImbalanceRegion
         { get; set; }
 
@@ -280,7 +275,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bars in bearish imbalance region", Description = "Highlight the bars closing below the -1 Std Deviation band.", Order = 7, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bars in bearish imbalance region", Description = "Highlight the bars closing below the Std Deviation 1 Lower band.", Order = 7, GroupName = "[03] Bars")]
         public bool HighlightBarsInBearishImbalanceRegion
         { get; set; }
 
@@ -465,7 +460,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 VersionInformation                          = $"{Version} - {Assembly.GetAssembly(typeof(VWAPDeluxe)).GetName().Version}";
                 Debug										= false;
 
-                AddPlot(new Stroke(Brushes.Orange, 3), PlotStyle.Line, "VWAP");
+                AddPlot(new Stroke(Brushes.Cyan, 3), PlotStyle.Line, "VWAP");
 
                 AddPlot(new Stroke(Brushes.DodgerBlue, 3), PlotStyle.Line, "Std Dev 1 Upper");
                 AddPlot(new Stroke(Brushes.DodgerBlue, 3), PlotStyle.Line, "Std Dev 1 Lower");
@@ -908,18 +903,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private LunarTick.VWAPDeluxe[] cacheVWAPDeluxe;
-		public LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, Data.TradingHours tradingHours, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return VWAPDeluxe(Input, resetInterval, resolution, tradingHours, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return VWAPDeluxe(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 
-		public LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input, NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, Data.TradingHours tradingHours, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input, NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
 			if (cacheVWAPDeluxe != null)
 				for (int idx = 0; idx < cacheVWAPDeluxe.Length; idx++)
-					if (cacheVWAPDeluxe[idx] != null && cacheVWAPDeluxe[idx].ResetInterval == resetInterval && cacheVWAPDeluxe[idx].Resolution == resolution && cacheVWAPDeluxe[idx].TradingHours == tradingHours && cacheVWAPDeluxe[idx].NumStandardDeviations == numStandardDeviations && cacheVWAPDeluxe[idx].StdDev1Multiplier == stdDev1Multiplier && cacheVWAPDeluxe[idx].StdDev2Multiplier == stdDev2Multiplier && cacheVWAPDeluxe[idx].StdDev3Multiplier == stdDev3Multiplier && cacheVWAPDeluxe[idx].EqualsInput(input))
+					if (cacheVWAPDeluxe[idx] != null && cacheVWAPDeluxe[idx].ResetInterval == resetInterval && cacheVWAPDeluxe[idx].Resolution == resolution && cacheVWAPDeluxe[idx].NumStandardDeviations == numStandardDeviations && cacheVWAPDeluxe[idx].StdDev1Multiplier == stdDev1Multiplier && cacheVWAPDeluxe[idx].StdDev2Multiplier == stdDev2Multiplier && cacheVWAPDeluxe[idx].StdDev3Multiplier == stdDev3Multiplier && cacheVWAPDeluxe[idx].EqualsInput(input))
 						return cacheVWAPDeluxe[idx];
-			return CacheIndicator<LunarTick.VWAPDeluxe>(new LunarTick.VWAPDeluxe(){ ResetInterval = resetInterval, Resolution = resolution, TradingHours = tradingHours, NumStandardDeviations = numStandardDeviations, StdDev1Multiplier = stdDev1Multiplier, StdDev2Multiplier = stdDev2Multiplier, StdDev3Multiplier = stdDev3Multiplier }, input, ref cacheVWAPDeluxe);
+			return CacheIndicator<LunarTick.VWAPDeluxe>(new LunarTick.VWAPDeluxe(){ ResetInterval = resetInterval, Resolution = resolution, NumStandardDeviations = numStandardDeviations, StdDev1Multiplier = stdDev1Multiplier, StdDev2Multiplier = stdDev2Multiplier, StdDev3Multiplier = stdDev3Multiplier }, input, ref cacheVWAPDeluxe);
 		}
 	}
 }
@@ -928,14 +923,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, Data.TradingHours tradingHours, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(Input, resetInterval, resolution, tradingHours, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.VWAPDeluxe(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, Data.TradingHours tradingHours, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(input, resetInterval, resolution, tradingHours, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.VWAPDeluxe(input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 	}
 }
@@ -944,14 +939,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, Data.TradingHours tradingHours, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(Input, resetInterval, resolution, tradingHours, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.VWAPDeluxe(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, Data.TradingHours tradingHours, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(input, resetInterval, resolution, tradingHours, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.VWAPDeluxe(input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 	}
 }
