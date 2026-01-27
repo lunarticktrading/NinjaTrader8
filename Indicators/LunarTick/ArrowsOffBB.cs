@@ -19,7 +19,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 	{
         #region Constants
 
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
 
         #endregion
 
@@ -136,12 +136,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             {
                 var bb = Bollinger(BBStdDevMultiplier, BBLength);
 
-				bool bullishEntry = (Close[1] > Open[1]) && (Close[2]< Open[2]) && (Low[1] < bb.Lower[1]) && (Low[2] < bb.Lower[2]);
-				bool bearishEntry = (Close[1] < Open[1]) && (Close[2] > Open[2]) && (High[1] > bb.Upper[1]) && (High[2] > bb.Upper[2]);
+                int lastClosedBarsAgo = (Calculate == Calculate.OnBarClose) ? 0 : 1;
+
+                bool bullishEntry = (Close[lastClosedBarsAgo] > Open[lastClosedBarsAgo]) && (Close[lastClosedBarsAgo + 1] < Open[lastClosedBarsAgo + 1]) && (Low[lastClosedBarsAgo] < bb.Lower[lastClosedBarsAgo]) && (Low[lastClosedBarsAgo + 1] < bb.Lower[lastClosedBarsAgo + 1]);
+				bool bearishEntry = (Close[lastClosedBarsAgo] < Open[lastClosedBarsAgo]) && (Close[lastClosedBarsAgo + 1] > Open[lastClosedBarsAgo + 1]) && (High[lastClosedBarsAgo] > bb.Upper[lastClosedBarsAgo]) && (High[lastClosedBarsAgo + 1] > bb.Upper[lastClosedBarsAgo + 1]);
 
 				if (bullishEntry)
 				{
-					Draw.ArrowUp(this, $"LongEntry{CurrentBar}", false, 1, Low[1] - TickSize, BullishColor);
+					Draw.ArrowUp(this, $"LongEntry{CurrentBar}", false, lastClosedBarsAgo, Low[lastClosedBarsAgo] - TickSize, BullishColor);
                     DebugPrint($"Detected bullish entry signal off lower BB");
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BullishArrowOffBBAlert))
@@ -152,7 +154,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 }
                 else if (bearishEntry)
 				{
-                    Draw.ArrowDown(this, $"ShortEntry{CurrentBar}", false, 1, High[1] + TickSize, BearishColor);
+                    Draw.ArrowDown(this, $"ShortEntry{CurrentBar}", false, lastClosedBarsAgo, High[lastClosedBarsAgo] + TickSize, BearishColor);
                     DebugPrint($"Detected bearish entry signal off upper BB");
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BearishArrowOffBBAlert))

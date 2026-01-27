@@ -18,7 +18,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 	{
         #region Constants
 
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
 
         #endregion
 
@@ -135,12 +135,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             {
                 var bb = Bollinger(BBStdDevMultiplier, BBLength);
 
-                bool bullishEngulfing = (Close[1] > Open[1]) && (Low[1] < bb.Lower[1]) && (Close[1] > bb.Lower[1]) && (Close[2] < Open[2]) && ((Close[1] - Open[1]) > (Open[2] - Close[2]));
-                bool bearishEngulfing = (Close[1] < Open[1]) && (High[1] > bb.Upper[1]) && (Close[1] < bb.Upper[1]) && (Close[2] > Open[2]) && ((Open[1] - Close[1]) > (Close[2] - Open[2]));
+                int lastClosedBarsAgo = (Calculate == Calculate.OnBarClose) ? 0 : 1;
+
+                bool bullishEngulfing = (Close[lastClosedBarsAgo] > Open[lastClosedBarsAgo]) && (Low[lastClosedBarsAgo] < bb.Lower[lastClosedBarsAgo]) && (Close[lastClosedBarsAgo] > bb.Lower[lastClosedBarsAgo]) && (Close[lastClosedBarsAgo + 1] < Open[lastClosedBarsAgo + 1]) && ((Close[lastClosedBarsAgo] - Open[lastClosedBarsAgo]) > (Open[lastClosedBarsAgo + 1] - Close[lastClosedBarsAgo + 1]));
+                bool bearishEngulfing = (Close[lastClosedBarsAgo] < Open[lastClosedBarsAgo]) && (High[lastClosedBarsAgo] > bb.Upper[lastClosedBarsAgo]) && (Close[lastClosedBarsAgo] < bb.Upper[lastClosedBarsAgo]) && (Close[lastClosedBarsAgo + 1] > Open[lastClosedBarsAgo + 1]) && ((Open[lastClosedBarsAgo] - Close[lastClosedBarsAgo]) > (Close[lastClosedBarsAgo + 1] - Open[lastClosedBarsAgo + 1]));
 
                 if (bullishEngulfing)
                 {
-					BarBrushes[1] = BullishColor;
+					BarBrushes[lastClosedBarsAgo] = BullishColor;
                     DebugPrint($"Detected bullish engulfing candle off lower BB");
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BullishEngulfingOffBBAlert))
@@ -151,7 +153,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 }
                 else if (bearishEngulfing)
                 {
-					BarBrushes[1] = BearishColor;
+					BarBrushes[lastClosedBarsAgo] = BearishColor;
                     DebugPrint($"Detected bearish engulfing candle off upper BB");
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BearishEngulfingOffBBAlert))
