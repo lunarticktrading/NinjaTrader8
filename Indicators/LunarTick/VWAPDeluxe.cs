@@ -415,6 +415,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 				//Disable this property if your indicator requires custom values that cumulate with each new market data event. 
 				//See Help Guide for additional information.
 				IsSuspendedWhileInactive					= true;
+
                 ResetInterval                               = VWAPResetInterval.Session;
 				Resolution                                  = VWAPResolution.Standard;
 				NumStandardDeviations                       = VWAPStandardDeviations.Three;
