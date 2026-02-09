@@ -132,7 +132,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         #endregion
 
@@ -505,7 +505,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 }
 
                 // Populate plots (only after IB region is confirmed).
-                if (currentIBRegion.IsConfirmed && (Time[0] > currentIBRegion.StartTime) && (Time[0] <= currentIBRegion.StartTime.AddDays(1)) && (CurrentBar > _lastBarPlotted))
+                if (currentIBRegion.IsConfirmed && (Time[0] > currentIBRegion.StartTime) && (CurrentBar > _lastBarPlotted))
                 {
                     int startBarsAgo = 0;
                     if (!currentIBRegion.IsBackFilled)
