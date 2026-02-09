@@ -33,7 +33,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [Range(0.1, double.MaxValue)]
-        [Display(Name = "BB StdDev Multiplier", Description = "BollingerBands Std Deviation Multiplier", Order = 2, GroupName = "[01] Parameters")]
+        [Display(Name = "BB StdDev Multiplier", Description = "Bollinger Bands Std Deviation Multiplier", Order = 2, GroupName = "[01] Parameters")]
         public double BBStdDevMultiplier
         { get; set; }
 
