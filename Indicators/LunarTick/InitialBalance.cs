@@ -73,6 +73,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 IsBackFilled = false;
                 StartBarIndex = -1;
                 EndBarIndex = -1;
+                LastPlotBarIndex = -1;
             }
 
             public MasterInstrument Instrument { get; }
@@ -103,6 +104,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             public bool IsBackFilled { get; set; }
             public int StartBarIndex { get; set; }
             public int EndBarIndex { get; set; }
+            public int LastPlotBarIndex { get; set; }
 
             public bool UpdateRange(double low, double high)
             {
@@ -132,7 +134,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.0.1";
+        public const string Version = "1.1.0";
 
         #endregion
 
@@ -166,29 +168,34 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Ext Level 1 multiplier", Order = 4, GroupName = "[01] Parameters")]
+        [Display(Name = "Ext Level 1 Multiplier", Order = 4, GroupName = "[01] Parameters")]
         public double ExtLevel1Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Ext Level 2 multiplier", Order = 5, GroupName = "[01] Parameters")]
+        [Display(Name = "Ext Level 2 Multiplier", Order = 5, GroupName = "[01] Parameters")]
         public double ExtLevel2Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Ext Level 3 multiplier", Order = 6, GroupName = "[01] Parameters")]
+        [Display(Name = "Ext Level 3 Multiplier", Order = 6, GroupName = "[01] Parameters")]
         public double ExtLevel3Multiplier
         { get; set; }
 
+        [Range(1, 365)]
+        [Display(Name = "Num Days To Show", Order = 1, GroupName = "[02] Display")]
+        public int NumDays
+        { get; set; }
+
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight Timeframe", Order = 1, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Timeframe", Order = 2, GroupName = "[02] Display")]
         public bool HighlightTimeframe
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight Timeframe color", Order = 2, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Timeframe Color", Order = 3, GroupName = "[02] Display")]
         public Brush HighlightTimeframeColor
         { get; set; }
 
@@ -200,17 +207,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight Timeframe opacity", Order = 3, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Timeframe Opacity", Order = 4, GroupName = "[02] Display")]
         public int HighlightTimeframeOpacity
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight Region", Order = 4, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Region", Order = 5, GroupName = "[02] Display")]
         public bool HighlightRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight Region color", Order = 5, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Region Color", Order = 6, GroupName = "[02] Display")]
         public Brush HighlightRegionColor
         { get; set; }
 
@@ -222,29 +229,29 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight Region opacity", Order = 6, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Region Opacity", Order = 7, GroupName = "[02] Display")]
         public int HighlightRegionOpacity
         { get; set; }
 
-        [Display(Name = "Show 50% Levels", Order = 7, GroupName = "[02] Display")]
+        [Display(Name = "Show 50% Levels", Order = 8, GroupName = "[02] Display")]
         public bool ShowMidLevels
         { get; set; }
 
-        [Display(Name = "Show Developing Region", Order = 8, GroupName = "[02] Display")]
+        [Display(Name = "Show Developing Region", Order = 9, GroupName = "[02] Display")]
         public bool ShowDevelopingRegion
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Show Labels", Order = 9, GroupName = "[02] Display")]
+        [Display(Name = "Show Labels", Order = 10, GroupName = "[02] Display")]
         public bool ShowLabels
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "Label Offset", Order = 10, GroupName = "[02] Display")]
+        [Display(Name = "Label Offset", Order = 11, GroupName = "[02] Display")]
         public int LabelOffset
         { get; set; }
 
-        [Display(Name = "Hide Joins", Order = 11, GroupName = "[02] Display")]
+        [Display(Name = "Hide Joins", Order = 12, GroupName = "[02] Display")]
         public bool HideJoins
         { get; set; }
 
@@ -406,6 +413,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 ExtLevel1Multiplier                         = 1;
                 ExtLevel2Multiplier                         = 2;
                 ExtLevel3Multiplier                         = 3;
+                NumDays                                     = 5;
                 HighlightTimeframe                          = false;
                 HighlightTimeframeColor                     = Brushes.Purple;
                 HighlightTimeframeOpacity                   = 20;
@@ -469,6 +477,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 			{
                 if (_ibRegions.Count == 0)
                     return;
+
+                if (NumDays > 0 && _ibRegions.Count > NumDays)
+                {
+                    // Need to trim oldest IB region.
+                    var oldestIBRegion = _ibRegions[0];
+                    _ibRegions.RemoveAt(0);
+                    CleanupRegion(oldestIBRegion);
+                }
 
                 var currentIBRegion = _ibRegions.Last();
 
@@ -661,6 +677,8 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     }
                 }
             }
+
+            ibRegion.LastPlotBarIndex = Math.Max(ibRegion.LastPlotBarIndex, CurrentBar - barsAgo);
         }
 
         private void ClearPlots(int barsAgo = 0)
@@ -705,6 +723,23 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 {
                     IBHighExt3Mid.Reset(barsAgo);
                     IBLowExt3Mid.Reset(barsAgo);
+                }
+            }
+        }
+
+        private void CleanupRegion(InitialBalanceRegion deadRegion)
+        {
+            // Remove the region.
+            DebugPrint($"Cleaning up region tag: {deadRegion.RegionTag}");
+            RemoveDrawObject(deadRegion.RegionTag);
+
+            // Clear the plots.
+            if (deadRegion.StartBarIndex >= 0 && deadRegion.LastPlotBarIndex >= 0 && deadRegion.LastPlotBarIndex >= deadRegion.StartBarIndex)
+            {
+                DebugPrint($"Cleaning up region plots from bar index {deadRegion.StartBarIndex} to {deadRegion.LastPlotBarIndex} (CurrentBar = {CurrentBar})");
+                for (int i = deadRegion.StartBarIndex; i <= deadRegion.LastPlotBarIndex; i++)
+                {
+                    ClearPlots(CurrentBar - i);
                 }
             }
         }
