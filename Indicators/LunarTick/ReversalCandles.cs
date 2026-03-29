@@ -27,7 +27,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 	{
         #region Constants
 
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         #endregion
 
@@ -206,9 +206,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             }
             else if (State == State.Configure)
 			{
-                _atr = ATR(ATRPeriod);
-                _sma10 = SMA(10);
-
                 _bullishBrush = BullishReversalBrush.CloneCurrentValue();
                 _bullishBrush.Opacity = DrawOpacity / 100.0;
                 _bullishBrush.Freeze();
@@ -217,9 +214,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 _bearishBrush.Opacity = DrawOpacity / 100.0;
                 _bearishBrush.Freeze();
             }
+            else if (State == State.DataLoaded)
+            {
+                _atr = ATR(ATRPeriod);
+                _sma10 = SMA(10);
+            }
         }
 
-		protected override void OnBarUpdate()
+        protected override void OnBarUpdate()
 		{
             if (CurrentBar < Math.Max(10, ATRPeriod))
                 return;
