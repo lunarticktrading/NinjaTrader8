@@ -56,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
         private const int MinTicks = 1;
 
         #endregion
@@ -108,6 +108,14 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [Display(Name = "Line Width", Order = 3, GroupName = "[02] Display")]
         public int LineWidth
+        { get; set; }
+
+        [Display(Name = "Show Dots", Order = 4, GroupName = "[02] Display")]
+        public bool ShowDots
+        { get; set; }
+
+        [Display(Name = "Dot Offset", Description = "Vertical offset (in ticks) between candle and dot.", Order = 5, GroupName = "[02] Display")]
+        public int DotOffset
         { get; set; }
 
         [Display(Name = "Enable Alerts", Description = "Trigger alerts for detected volume imbalances.", Order = 1, GroupName = "[03] Alerts")]
@@ -163,6 +171,8 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 BullishColor                                = Brushes.Aqua;
                 BearishColor								= Brushes.Fuchsia;
 				LineWidth									= 6;
+                ShowDots                                    = true;
+                DotOffset                                   = 1;
                 EnableAlerts                                = false;
                 AlertSoundsPath                             = DefaultAlertFilePath();
                 BullishVolumeImbalanceAlert                 = "VolumeImbalance.wav";
@@ -306,8 +316,11 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             {
 				int barsAgo = CurrentBar - volumeImbalance.StartBarIndex;
 
-                volumeImbalance.DotTag = $"VolumeImbalanceDot{volumeImbalance.StartBarIndex}";
-				Draw.Dot(this, volumeImbalance.DotTag, false, barsAgo, volumeImbalance.Direction == Direction.Bullish ? (Low[barsAgo] - TickSize) : (High[barsAgo] + TickSize), volumeImbalance.Direction == Direction.Bullish ? BullishColor : BearishColor);
+                if (ShowDots)
+                {
+                    volumeImbalance.DotTag = $"VolumeImbalanceDot{volumeImbalance.StartBarIndex}";
+                    Draw.Dot(this, volumeImbalance.DotTag, false, barsAgo, volumeImbalance.Direction == Direction.Bullish ? (Low[barsAgo] - (DotOffset * TickSize)) : (High[barsAgo] + (DotOffset * TickSize)), volumeImbalance.Direction == Direction.Bullish ? BullishColor : BearishColor);
+                }
 
                 volumeImbalance.LineTag = $"VolumeImbalanceLine{volumeImbalance.StartBarIndex}";
 				var lineY = volumeImbalance.Direction == Direction.Bullish ? volumeImbalance.High : volumeImbalance.Low;
