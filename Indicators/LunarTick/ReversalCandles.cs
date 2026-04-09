@@ -27,7 +27,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 	{
         #region Constants
 
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         #endregion
 
@@ -151,9 +151,16 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [Browsable(false)]
         [XmlIgnore]
-        public Series<double> ReversalCandle
+        public Series<double> BullishReversalCandle
         {
             get { return Values[0]; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore]
+        public Series<double> BearishReversalCandle
+        {
+            get { return Values[1]; }
         }
 
         #endregion
@@ -202,7 +209,8 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 VersionInformation                                  = $"{Version} - {Assembly.GetAssembly(typeof(ReversalCandles)).GetName().Version}";
                 Debug                                               = false;
 
-                AddPlot(Brushes.Transparent, "Reversal Candle");
+                AddPlot(Brushes.Transparent, "Bullish Reversal Candle");
+                AddPlot(Brushes.Transparent, "Bearish Reversal Candle");
             }
             else if (State == State.Configure)
 			{
@@ -263,7 +271,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 // Draw reversals
                 if (bullishReversal)
                 {
-                    ReversalCandle[barsAgo] = 1.0;
+                    BullishReversalCandle[barsAgo] = 1.0;
                     SimpleFont font = new SimpleFont("Arial", DrawSize);
                     string label = "\u25B2";
                     int numLines = 1;
@@ -295,7 +303,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 }
                 if (bearishReversal)
                 {
-                    ReversalCandle[barsAgo] = -1.0;
+                    BearishReversalCandle[barsAgo] = 1.0;
                     SimpleFont font = new SimpleFont("Arial", DrawSize);
                     string label = "";
                     int numLines = 1;
