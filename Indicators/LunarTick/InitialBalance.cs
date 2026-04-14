@@ -25,6 +25,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
     namespace InitialBalanceEnums
     {
+        public enum ExtendPlots
+        {
+            EndOfSession,
+            NextInitialBalance
+        }
+
         public enum InitialBalanceExtensionLevels
         {
             None,
@@ -53,19 +59,20 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
     }
 
-    [Gui.CategoryOrder("[01] Parameters", 1)]
-    [Gui.CategoryOrder("[02] Display", 2)]
-    [Gui.CategoryOrder("[03] Developer", 3)]
+    [Gui.CategoryOrder("Parameters", 1)]
+    [Gui.CategoryOrder("Display", 2)]
+    [Gui.CategoryOrder("Developer", 3)]
     [TypeConverter("NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceTypeConverter")]
     public class InitialBalance : Indicator
 	{
         public class InitialBalanceRegion
         {
-            public InitialBalanceRegion(MasterInstrument instrument, DateTime startTime, DateTime endTime)
+            public InitialBalanceRegion(MasterInstrument instrument, DateTime startTime, DateTime endTime, DateTime sessionEndTime)
             {
                 Instrument = instrument;
                 StartTime = startTime;
                 EndTime = endTime;
+                SessionEndTime = sessionEndTime;
                 RegionTag = null;
                 High = null;
                 Low = null;
@@ -79,6 +86,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             public MasterInstrument Instrument { get; }
             public DateTime StartTime { get; }
             public DateTime EndTime { get; }
+            public DateTime SessionEndTime { get; }
             public string? RegionTag { get; set; }
             public double? High { get; private set; }
             public double? Low { get; private set; }
@@ -134,7 +142,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
 
         #endregion
 
@@ -149,53 +157,59 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         #region Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Start Time", Order = 1, GroupName = "[01] Parameters")]
+        [Display(Name = "Session Start Time", Order = 1, GroupName = "Parameters")]
         [PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-        public DateTime StartTime
+        public DateTime SessionStartTime
         { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "End Time", Order = 2, GroupName = "[01] Parameters")]
+        [Display(Name = "Session End Time", Order = 2, GroupName = "Parameters")]
         [PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-        public DateTime EndTime
+        public DateTime SessionEndTime
+        { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1, 60)]
+        [Display(Name = "Initial Balance Duration (Minutes)", Order = 3, GroupName = "Parameters")]
+        public int InitialBalanceDurationMinutes
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
         [NinjaScriptProperty]
-        [Display(Name = "Extension Levels", Order = 3, GroupName = "[01] Parameters")]
+        [Display(Name = "Extension Levels", Order = 4, GroupName = "Parameters")]
         public NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels ExtensionLevels
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Ext Level 1 Multiplier", Order = 4, GroupName = "[01] Parameters")]
+        [Display(Name = "Ext Level 1 Multiplier", Order = 5, GroupName = "Parameters")]
         public double ExtLevel1Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Ext Level 2 Multiplier", Order = 5, GroupName = "[01] Parameters")]
+        [Display(Name = "Ext Level 2 Multiplier", Order = 6, GroupName = "Parameters")]
         public double ExtLevel2Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Ext Level 3 Multiplier", Order = 6, GroupName = "[01] Parameters")]
+        [Display(Name = "Ext Level 3 Multiplier", Order = 7, GroupName = "Parameters")]
         public double ExtLevel3Multiplier
         { get; set; }
 
         [Range(1, 365)]
-        [Display(Name = "Num Days To Show", Order = 1, GroupName = "[02] Display")]
+        [Display(Name = "Num Days To Show", Order = 1, GroupName = "Display")]
         public int NumDays
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight Timeframe", Order = 2, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Timeframe", Order = 2, GroupName = "Display")]
         public bool HighlightTimeframe
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight Timeframe Color", Order = 3, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Timeframe Color", Order = 3, GroupName = "Display")]
         public Brush HighlightTimeframeColor
         { get; set; }
 
@@ -207,17 +221,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight Timeframe Opacity", Order = 4, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Timeframe Opacity", Order = 4, GroupName = "Display")]
         public int HighlightTimeframeOpacity
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight Region", Order = 5, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Region", Order = 5, GroupName = "Display")]
         public bool HighlightRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight Region Color", Order = 6, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Region Color", Order = 6, GroupName = "Display")]
         public Brush HighlightRegionColor
         { get; set; }
 
@@ -229,39 +243,43 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight Region Opacity", Order = 7, GroupName = "[02] Display")]
+        [Display(Name = "Highlight Region Opacity", Order = 7, GroupName = "Display")]
         public int HighlightRegionOpacity
         { get; set; }
 
-        [Display(Name = "Show 50% Levels", Order = 8, GroupName = "[02] Display")]
+        [Display(Name = "Extend Levels Until", Order = 8, GroupName = "Display")]
+        public NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.ExtendPlots ExtendLevelsUntil
+        { get; set; }
+
+        [Display(Name = "Show 50% Levels", Order = 9, GroupName = "Display")]
         public bool ShowMidLevels
         { get; set; }
 
-        [Display(Name = "Show Developing Region", Order = 9, GroupName = "[02] Display")]
+        [Display(Name = "Show Developing Region", Order = 10, GroupName = "Display")]
         public bool ShowDevelopingRegion
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Show Labels", Order = 10, GroupName = "[02] Display")]
+        [Display(Name = "Show Labels", Order = 11, GroupName = "Display")]
         public bool ShowLabels
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "Label Offset", Order = 11, GroupName = "[02] Display")]
+        [Display(Name = "Label Offset", Order = 12, GroupName = "Display")]
         public int LabelOffset
         { get; set; }
 
-        [Display(Name = "Hide Joins", Order = 12, GroupName = "[02] Display")]
+        [Display(Name = "Hide Joins", Order = 13, GroupName = "Display")]
         public bool HideJoins
         { get; set; }
 
         [ReadOnly(true)]
         [XmlIgnore]
-        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "[03] Developer")]
+        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "Developer")]
         public string VersionInformation
         { get; set; }
 
-        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "[03] Developer")]
+        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "Developer")]
         public bool Debug
         { get; set; }
 
@@ -381,7 +399,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 if (State == State.SetDefaults)
                     return DefaultName;
 
-                return Name + "(" + StartTime.ToString("HH:mm") + "," + EndTime.ToString("HH:mm") + "," + ExtensionLevels + "," + ExtLevel1Multiplier + "," + ExtLevel2Multiplier + "," + ExtLevel3Multiplier + ")";
+                return Name + "(" + SessionStartTime.ToString("HH:mm") + "," + SessionEndTime.ToString("HH:mm") + "," + InitialBalanceDurationMinutes + "," + ExtensionLevels + "," + ExtLevel1Multiplier + "," + ExtLevel2Multiplier + "," + ExtLevel3Multiplier + ")";
             }
         }
 
@@ -407,8 +425,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 				//See Help Guide for additional information.
 				IsSuspendedWhileInactive					= true;
 
-                StartTime                                   = DateTime.Parse("09:30:00");
-                EndTime                                     = DateTime.Parse("10:30:00");
+                SessionStartTime                            = DateTime.Parse("09:30:00");
+                SessionEndTime                              = DateTime.Parse("17:00:00");
+                InitialBalanceDurationMinutes               = 60;
                 ExtensionLevels                             = InitialBalanceEnums.InitialBalanceExtensionLevels.None;
                 ExtLevel1Multiplier                         = 1;
                 ExtLevel2Multiplier                         = 2;
@@ -420,6 +439,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 HighlightRegion                             = true;
                 HighlightRegionColor                        = Brushes.Yellow;
                 HighlightRegionOpacity                      = 20;
+                ExtendLevelsUntil                           = ExtendPlots.EndOfSession;
                 ShowMidLevels                               = true;
                 ShowDevelopingRegion                        = true;
                 ShowLabels                                  = true;
@@ -467,8 +487,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (CurrentBar < 1)
                 return;
 
-            int ibStartTime = ToTime(StartTime);
-            int ibEndTime = ToTime(EndTime);
+            int ibStartTime = ToTime(SessionStartTime);
+            int ibEndTime = ToTime(SessionStartTime.AddMinutes(InitialBalanceDurationMinutes));
+            int sessionEndTime = ToTime(SessionEndTime);
             int prevBarEndTime = ToTime(Time[1]);
             int currentBarEndTime = ToTime(Time[0]);
             int currentBarStartTime = prevBarEndTime;
@@ -547,11 +568,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 // Check for start of new IB region.
                 if (IsFirstTickOfBar && currentBarStartTime == ibStartTime)
                 {
-                    DateTime startTime = Time[1];
-                    DateTime endTime = new DateTime(startTime.Year, startTime.Month, startTime.Day, EndTime.Hour, EndTime.Minute, 0, startTime.Kind);
-                    if (ibEndTime < ibStartTime)
-                        endTime = endTime.AddDays(1);
-                    currentIBRegion = new InitialBalanceRegion(Instrument.MasterInstrument, startTime, endTime);
+                    DateTime dtStartTime = Time[1];
+                    DateTime dtEndTime = dtStartTime.AddMinutes(InitialBalanceDurationMinutes);
+                    DateTime dtSessionEndTime = new DateTime(dtStartTime.Year, dtStartTime.Month, dtStartTime.Day, SessionEndTime.Hour, SessionEndTime.Minute, 0, dtStartTime.Kind);
+                    if (sessionEndTime < ibStartTime)
+                        dtSessionEndTime = dtSessionEndTime.AddDays(1);
+                    currentIBRegion = new InitialBalanceRegion(Instrument.MasterInstrument, dtStartTime, dtEndTime, dtSessionEndTime);
                     _ibRegions.Add(currentIBRegion);
                 }
                 else if (_ibRegions.Count > 0)
@@ -590,6 +612,13 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         {
             if (barsAgo >= IBHigh.Count)
                 return;
+
+            if (ExtendLevelsUntil == ExtendPlots.EndOfSession)
+            {
+                var barStartTime = Time[barsAgo + 1]; // Use end time of previous bar
+                if (barStartTime >= ibRegion.SessionEndTime)
+                    return;
+            }
 
             bool showExt1 = ExtensionLevels != InitialBalanceEnums.InitialBalanceExtensionLevels.None;
             bool showExt2 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Two || ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;
@@ -849,18 +878,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private LunarTick.InitialBalance[] cacheInitialBalance;
-		public LunarTick.InitialBalance InitialBalance(DateTime startTime, DateTime endTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return InitialBalance(Input, startTime, endTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return InitialBalance(Input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 
-		public LunarTick.InitialBalance InitialBalance(ISeries<double> input, DateTime startTime, DateTime endTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public LunarTick.InitialBalance InitialBalance(ISeries<double> input, DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
 			if (cacheInitialBalance != null)
 				for (int idx = 0; idx < cacheInitialBalance.Length; idx++)
-					if (cacheInitialBalance[idx] != null && cacheInitialBalance[idx].StartTime == startTime && cacheInitialBalance[idx].EndTime == endTime && cacheInitialBalance[idx].ExtensionLevels == extensionLevels && cacheInitialBalance[idx].ExtLevel1Multiplier == extLevel1Multiplier && cacheInitialBalance[idx].ExtLevel2Multiplier == extLevel2Multiplier && cacheInitialBalance[idx].ExtLevel3Multiplier == extLevel3Multiplier && cacheInitialBalance[idx].EqualsInput(input))
+					if (cacheInitialBalance[idx] != null && cacheInitialBalance[idx].SessionStartTime == sessionStartTime && cacheInitialBalance[idx].SessionEndTime == sessionEndTime && cacheInitialBalance[idx].InitialBalanceDurationMinutes == initialBalanceDurationMinutes && cacheInitialBalance[idx].ExtensionLevels == extensionLevels && cacheInitialBalance[idx].ExtLevel1Multiplier == extLevel1Multiplier && cacheInitialBalance[idx].ExtLevel2Multiplier == extLevel2Multiplier && cacheInitialBalance[idx].ExtLevel3Multiplier == extLevel3Multiplier && cacheInitialBalance[idx].EqualsInput(input))
 						return cacheInitialBalance[idx];
-			return CacheIndicator<LunarTick.InitialBalance>(new LunarTick.InitialBalance(){ StartTime = startTime, EndTime = endTime, ExtensionLevels = extensionLevels, ExtLevel1Multiplier = extLevel1Multiplier, ExtLevel2Multiplier = extLevel2Multiplier, ExtLevel3Multiplier = extLevel3Multiplier }, input, ref cacheInitialBalance);
+			return CacheIndicator<LunarTick.InitialBalance>(new LunarTick.InitialBalance(){ SessionStartTime = sessionStartTime, SessionEndTime = sessionEndTime, InitialBalanceDurationMinutes = initialBalanceDurationMinutes, ExtensionLevels = extensionLevels, ExtLevel1Multiplier = extLevel1Multiplier, ExtLevel2Multiplier = extLevel2Multiplier, ExtLevel3Multiplier = extLevel3Multiplier }, input, ref cacheInitialBalance);
 		}
 	}
 }
@@ -869,14 +898,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime startTime, DateTime endTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(Input, startTime, endTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(Input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 
-		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime startTime, DateTime endTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(input, startTime, endTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 	}
 }
@@ -885,14 +914,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime startTime, DateTime endTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(Input, startTime, endTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(Input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 
-		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime startTime, DateTime endTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(input, startTime, endTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 	}
 }
