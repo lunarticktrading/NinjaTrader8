@@ -1,33 +1,34 @@
 #region Using declarations
-using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Xml.Serialization;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Tools;
 using NinjaTrader.NinjaScript.DrawingTools;
+using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Xml.Serialization;
+using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using TextAlignment = System.Windows.TextAlignment;
-using Brush = System.Windows.Media.Brush;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
-    [Gui.CategoryOrder("[01] Parameters", 1)]
-    [Gui.CategoryOrder("[02] Wick Reversals", 2)]
-    [Gui.CategoryOrder("[03] Extreme Reversals", 3)]
-    [Gui.CategoryOrder("[04] Outside Reversals", 4)]
-    [Gui.CategoryOrder("[05] Doji Reversals", 5)]
-    [Gui.CategoryOrder("[06] Display", 6)]
-    [Gui.CategoryOrder("[07] Developer", 7)]
+    [Gui.CategoryOrder("Parameters", 1)]
+    [Gui.CategoryOrder("Wick Reversals", 2)]
+    [Gui.CategoryOrder("Extreme Reversals", 3)]
+    [Gui.CategoryOrder("Outside Reversals", 4)]
+    [Gui.CategoryOrder("Doji Reversals", 5)]
+    [Gui.CategoryOrder("Display", 6)]
+    [Gui.CategoryOrder("Developer", 7)]
+    [TypeConverter("NinjaTrader.NinjaScript.Indicators.LunarTick.ReversalCandlesTypeConverter")]
     public class ReversalCandles : Indicator
 	{
         #region Constants
 
-        public const string Version = "1.0.2";
+        public const string Version = "1.0.3";
 
         #endregion
 
@@ -44,59 +45,63 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [Range(1, int.MaxValue)]
-        [Display(Name = "ATRPeriod", Description = "ATR period used for determining the average candle length.", Order = 1, GroupName = "[01] Parameters")]
+        [Display(Name = "ATR Period", Description = "ATR period used for determining the average candle length.", Order = 1, GroupName = "Parameters")]
         public int ATRPeriod
         { get; set; }
 
-        [Display(Name = "EnableWickReversals", Order = 1, GroupName = "[02] Wick Reversals")]
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Enable Wick Reversals", Order = 1, GroupName = "Wick Reversals")]
         public bool EnableWickReversals
         { get; set; }
 
         [Range(0, double.MaxValue)]
-        [Display(Name = "WickReversalsWickBodyRatio", Description = "A reversal wick length must be at least the chosen multiple of the body length.", Order = 2, GroupName = "[02] Wick Reversals")]
+        [Display(Name = "Wick/Body Ratio", Description = "A reversal wick length must be at least the chosen multiple of the body length.", Order = 2, GroupName = "Wick Reversals")]
         public double WickReversalsWickBodyRatio
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "WickReversalsClosePercent", Description = "A bullish candle must close within the chosen percentage distance from the high.nA bearish candle must close within the chosen percentage distance from the low.", Order = 3, GroupName = "[02] Wick Reversals")]
+        [Display(Name = "Close Percent", Description = "A bullish candle must close within the chosen percentage distance from the high.nA bearish candle must close within the chosen percentage distance from the low.", Order = 3, GroupName = "Wick Reversals")]
         public double WickReversalsClosePercent
         { get; set; }
 
-        [Display(Name = "EnableExtremeReversals", Order = 1, GroupName = "[03] Extreme Reversals")]
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Enable Extreme Reversals", Order = 1, GroupName = "Extreme Reversals")]
         public bool EnableExtremeReversals
         { get; set; }
 
         [Range(1, int.MaxValue)]
-        [Display(Name = "ExtremeReversalsExtremeBarMultipleOfAverage", Description = "Extreme candle length must be at least the chosen multiple of the average candle length.", Order = 2, GroupName = "[03] Extreme Reversals")]
+        [Display(Name = "Extreme Bar Multiple Of Average", Description = "Extreme candle length must be at least the chosen multiple of the average candle length.", Order = 2, GroupName = "Extreme Reversals")]
         public int ExtremeReversalsExtremeBarMultipleOfAverage
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "ExtremeReversalsExtremeBarMinBodyPercent", Description = "Extreme candle body must be at least the chosen percentage of total candle length.", Order = 3, GroupName = "[03] Extreme Reversals")]
+        [Display(Name = "Extreme Bar Min Body Percent", Description = "Extreme candle body must be at least the chosen percentage of total candle length.", Order = 3, GroupName = "Extreme Reversals")]
         public double ExtremeReversalsExtremeBarMinBodyPercent
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "ExtremeReversalsExtremeBarMaxBodyPercent", Description = "Extreme candle body must be less than the chosen percentage of total candle length.", Order = 4, GroupName = "[03] Extreme Reversals")]
+        [Display(Name = "Extreme Bar Max Body Percent", Description = "Extreme candle body must be less than the chosen percentage of total candle length.", Order = 4, GroupName = "Extreme Reversals")]
         public double ExtremeReversalsExtremeBarMaxBodyPercent
         { get; set; }
 
-        [Display(Name = "EnableOutsideReversals", Order = 1, GroupName = "[04] Outside Reversals")]
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Enable Outside Reversals", Order = 1, GroupName = "Outside Reversals")]
         public bool EnableOutsideReversals
         { get; set; }
 
         [Range(0, double.MaxValue)]
-        [Display(Name = "OutsideReversalsEngulfingLargerThanAveragePercent", Description = "Engulfing candle must be the chosen percentage larger than the average candle.", Order = 2, GroupName = "[04] Outside Reversals")]
+        [Display(Name = "Engulfing Larger Than Average Percent", Description = "Engulfing candle must be the chosen percentage larger than the average candle.", Order = 2, GroupName = "Outside Reversals")]
         public double OutsideReversalsEngulfingLargerThanAveragePercent
         { get; set; }
 
-        [Display(Name = "EnableDojiReversals", Order = 1, GroupName = "[05] Doji Reversals")]
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Enable Doji Reversals", Order = 1, GroupName = "Doji Reversals")]
         public bool EnableDojiReversals
         { get; set; }
 
         [NinjaScriptProperty]
         [XmlIgnore]
-        [Display(Name = "Bullish Reversal Color", Description = "Color used for bullish reversals.", Order = 1, GroupName = "[06] Display")]
+        [Display(Name = "Bullish Reversal Color", Description = "Color used for bullish reversals.", Order = 1, GroupName = "Display")]
         public Brush BullishReversalBrush
         { get; set; }
 
@@ -109,7 +114,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [XmlIgnore]
-        [Display(Name = "Bearish Reversal Color", Description = "Color used for bearish reversals.", Order = 2, GroupName = "[06] Display")]
+        [Display(Name = "Bearish Reversal Color", Description = "Color used for bearish reversals.", Order = 2, GroupName = "Display")]
         public Brush BearishReversalBrush
         { get; set; }
 
@@ -121,31 +126,31 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(1, 100)]
-        [Display(Name = "Draw Size", Order = 3, GroupName = "[06] Display")]
+        [Display(Name = "Draw Size", Order = 3, GroupName = "Display")]
         public int DrawSize
         { get; set; }
 
         [Range(1, 100)]
-        [Display(Name = "Draw Opacity", Order = 4, GroupName = "[06] Display")]
+        [Display(Name = "Draw Opacity", Order = 4, GroupName = "Display")]
         public int DrawOpacity
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "Draw Offset", Order = 5, GroupName = "[06] Display")]
+        [Display(Name = "Draw Offset", Order = 5, GroupName = "Display")]
         public int DrawOffset
         { get; set; }
 
-        [Display(Name = "ShowLabels", Order = 6, GroupName = "[06] Display")]
+        [Display(Name = "Show Labels", Order = 6, GroupName = "Display")]
         public bool ShowLabels
         { get; set; }
 
         [ReadOnly(true)]
         [XmlIgnore]
-        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "[07] Developer")]
+        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "Developer")]
         public string VersionInformation
         { get; set; }
 
-        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "[07] Developer")]
+        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "Developer")]
         public bool Debug
         { get; set; }
 
@@ -234,9 +239,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (CurrentBar < Math.Max(10, ATRPeriod))
                 return;
 
-            if (IsFirstTickOfBar)
+            if ((Calculate == Calculate.OnBarClose) || IsFirstTickOfBar)
             {
-                int barsAgo = 1;
+                int barsAgo = (Calculate == Calculate.OnBarClose) ? 0 : 1;
 
                 var barRange = High[barsAgo] - Low[barsAgo];
                 var barBodyLength = Math.Max(Open[barsAgo], Close[barsAgo]) - Math.Min(Open[barsAgo], Close[barsAgo]);
@@ -299,7 +304,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                         }
                     }
                     int yOffset = (int)(((numLines * font.TextFormatHeight) / 2.0) + (DrawOffset * font.TextFormatHeight));
-                    Draw.Text(this, $"BullishReversalCandle-{CurrentBar}", false, label, barsAgo, Low[barsAgo], -yOffset, _bullishBrush, font, TextAlignment.Center, Brushes.Transparent, Brushes.Transparent, 0);
+                    Draw.Text(this, $"BullishReversalCandle{CurrentBar - barsAgo}", false, label, barsAgo, Low[barsAgo], -yOffset, _bullishBrush, font, TextAlignment.Center, Brushes.Transparent, Brushes.Transparent, 0);
                 }
                 if (bearishReversal)
                 {
@@ -332,7 +337,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     }
                     label += "\u25BC";
                     int yOffset = (int)(((numLines * font.TextFormatHeight) / 2.0) + (DrawOffset * font.TextFormatHeight));
-                    Draw.Text(this, $"BearishReversalCandle-{CurrentBar}", false, label, barsAgo, High[barsAgo], yOffset, _bearishBrush, font, TextAlignment.Center, Brushes.Transparent, Brushes.Transparent, 0);
+                    Draw.Text(this, $"BearishReversalCandle{CurrentBar - barsAgo}", false, label, barsAgo, High[barsAgo], yOffset, _bearishBrush, font, TextAlignment.Center, Brushes.Transparent, Brushes.Transparent, 0);
                 }
             }
         }
@@ -353,6 +358,63 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         #endregion
+    }
+
+    public class ReversalCandlesTypeConverter : IndicatorBaseConverter
+    {
+        public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object component, Attribute[] attrs)
+        {
+            // We need the indicator instance which actually exists on the grid
+            ReversalCandles indicator = component as ReversalCandles;
+
+            // base.GetProperties ensures we have all the properties (and associated property grid editors)
+            // NinjaTrader internal logic determines for a given indicator
+            PropertyDescriptorCollection propertyDescriptorCollection = base.GetPropertiesSupported(context)
+                                                                        ? base.GetProperties(context, component, attrs)
+                                                                        : TypeDescriptor.GetProperties(component, attrs);
+
+            if (indicator == null || propertyDescriptorCollection == null)
+                return propertyDescriptorCollection;
+
+            // Show/hide properties related to EnableWickReversals
+            PropertyDescriptor wickReversalsWickBodyRatioPropertyDesc = propertyDescriptorCollection["WickReversalsWickBodyRatio"];
+            PropertyDescriptor wickReversalsClosePercentPropertyDesc = propertyDescriptorCollection["WickReversalsClosePercent"];
+            propertyDescriptorCollection.Remove(wickReversalsWickBodyRatioPropertyDesc);
+            propertyDescriptorCollection.Remove(wickReversalsClosePercentPropertyDesc);
+            if (indicator.EnableWickReversals)
+            {
+                propertyDescriptorCollection.Add(wickReversalsWickBodyRatioPropertyDesc);
+                propertyDescriptorCollection.Add(wickReversalsClosePercentPropertyDesc);
+            }
+
+            // Show/hide properties related to EnableExtremeReversals
+            PropertyDescriptor extremeReversalsExtremeBarMultipleOfAveragePropertyDesc = propertyDescriptorCollection["ExtremeReversalsExtremeBarMultipleOfAverage"];
+            PropertyDescriptor extremeReversalsExtremeBarMinBodyPercentPropertyDesc = propertyDescriptorCollection["ExtremeReversalsExtremeBarMinBodyPercent"];
+            PropertyDescriptor extremeReversalsExtremeBarMaxBodyPercentPropertyDesc = propertyDescriptorCollection["ExtremeReversalsExtremeBarMaxBodyPercent"];
+            propertyDescriptorCollection.Remove(extremeReversalsExtremeBarMultipleOfAveragePropertyDesc);
+            propertyDescriptorCollection.Remove(extremeReversalsExtremeBarMinBodyPercentPropertyDesc);
+            propertyDescriptorCollection.Remove(extremeReversalsExtremeBarMaxBodyPercentPropertyDesc);
+            if (indicator.EnableExtremeReversals)
+            {
+                propertyDescriptorCollection.Add(extremeReversalsExtremeBarMultipleOfAveragePropertyDesc);
+                propertyDescriptorCollection.Add(extremeReversalsExtremeBarMinBodyPercentPropertyDesc);
+                propertyDescriptorCollection.Add(extremeReversalsExtremeBarMaxBodyPercentPropertyDesc);
+            }
+
+            // Show/hide properties related to EnableOutsideReversals
+            PropertyDescriptor outsideReversalsEngulfingLargerThanAveragePercentPropertyDesc = propertyDescriptorCollection["OutsideReversalsEngulfingLargerThanAveragePercent"];
+            propertyDescriptorCollection.Remove(outsideReversalsEngulfingLargerThanAveragePercentPropertyDesc);
+            if (indicator.EnableOutsideReversals)
+            {
+                propertyDescriptorCollection.Add(outsideReversalsEngulfingLargerThanAveragePercentPropertyDesc);
+            }
+
+            return propertyDescriptorCollection;
+        }
+
+        // Important: This must return true otherwise the type convetor will not be called
+        public override bool GetPropertiesSupported(ITypeDescriptorContext context)
+        { return true; }
     }
 }
 
