@@ -19,7 +19,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 	{
         #region Constants
 
-        public const string Version = "1.1.1";
+        public const string Version = "1.1.2";
 
         #endregion
 
@@ -143,7 +143,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
 				if (bullishEntry)
 				{
-					Draw.ArrowUp(this, $"LongEntry{CurrentBar}", false, lastClosedBarsAgo, Low[lastClosedBarsAgo] - TickSize, BullishColor);
+					Draw.ArrowUp(this, $"LongEntry{CurrentBar - lastClosedBarsAgo}", false, lastClosedBarsAgo, Low[lastClosedBarsAgo] - TickSize, BullishColor);
                     DebugPrint($"Detected bullish entry signal off lower BB");
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BullishArrowOffBBAlert))
@@ -154,7 +154,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 }
                 else if (bearishEntry)
 				{
-                    Draw.ArrowDown(this, $"ShortEntry{CurrentBar}", false, lastClosedBarsAgo, High[lastClosedBarsAgo] + TickSize, BearishColor);
+                    Draw.ArrowDown(this, $"ShortEntry{CurrentBar - lastClosedBarsAgo}", false, lastClosedBarsAgo, High[lastClosedBarsAgo] + TickSize, BearishColor);
                     DebugPrint($"Detected bearish entry signal off upper BB");
 
                     if (EnableAlerts && (State == State.Realtime) && !string.IsNullOrWhiteSpace(BearishArrowOffBBAlert))
