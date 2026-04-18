@@ -32,10 +32,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         #endregion
 
         #region Indicator methods
-        public LaguerreRSI()
-        {
-            VendorLicense(283);
-        }
 
         protected override void OnStateChange()
         {
