@@ -1,23 +1,20 @@
 #region Using declarations
+using NinjaTrader.Cbi;
+using NinjaTrader.Data;
+using NinjaTrader.Gui;
+using NinjaTrader.Gui.Chart;
+using NinjaTrader.Gui.Tools;
+using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using NinjaTrader.Cbi;
-using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.Tools;
-using NinjaTrader.Data;
-using NinjaTrader.NinjaScript.DrawingTools;
-using System.Reflection;
-using NinjaTrader.NinjaScript.MarketAnalyzerColumns;
-using NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums;
-using NinjaTrader.NinjaScript.Indicators.LunarTick;
-using NinjaTrader.NinjaScript;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -142,7 +139,8 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.2.0";
+        public const string Version = "1.2.1";
+        public const int InitialBalanceDurationMinutes = 60;
 
         #endregion
 
@@ -166,12 +164,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         [Display(Name = "Session End Time", Order = 2, GroupName = "Parameters")]
         [PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
         public DateTime SessionEndTime
-        { get; set; }
-
-        [NinjaScriptProperty]
-        [Range(1, 60)]
-        [Display(Name = "Initial Balance Duration (Minutes)", Order = 3, GroupName = "Parameters")]
-        public int InitialBalanceDurationMinutes
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
@@ -427,17 +419,16 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
                 SessionStartTime                            = DateTime.Parse("09:30:00");
                 SessionEndTime                              = DateTime.Parse("17:00:00");
-                InitialBalanceDurationMinutes               = 60;
                 ExtensionLevels                             = InitialBalanceEnums.InitialBalanceExtensionLevels.None;
                 ExtLevel1Multiplier                         = 1;
                 ExtLevel2Multiplier                         = 2;
                 ExtLevel3Multiplier                         = 3;
                 NumDays                                     = 5;
                 HighlightTimeframe                          = false;
-                HighlightTimeframeColor                     = Brushes.Purple;
+                HighlightTimeframeColor                     = Brushes.Cyan;
                 HighlightTimeframeOpacity                   = 20;
                 HighlightRegion                             = true;
-                HighlightRegionColor                        = Brushes.Yellow;
+                HighlightRegionColor                        = Brushes.Cyan;
                 HighlightRegionOpacity                      = 20;
                 ExtendLevelsUntil                           = ExtendPlots.EndOfSession;
                 ShowMidLevels                               = true;
@@ -449,21 +440,21 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 VersionInformation                          = $"{Version} - {Assembly.GetAssembly(typeof(InitialBalance)).GetName().Version}";
                 Debug                                       = false;
 
-                AddPlot(new Stroke(Brushes.Green, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High Ext3");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB High Ext3 50%");
-                AddPlot(new Stroke(Brushes.Green, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High Ext2");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB High Ext2 50%");
-                AddPlot(new Stroke(Brushes.Green, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High Ext1");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB High Ext1 50%");
-                AddPlot(new Stroke(Brushes.Green, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB 50%");
-                AddPlot(new Stroke(Brushes.Red, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB Low Ext1 50%");
-                AddPlot(new Stroke(Brushes.Red, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low Ext1");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB Low Ext2 50%");
-                AddPlot(new Stroke(Brushes.Red, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low Ext2");
-                AddPlot(new Stroke(Brushes.Goldenrod, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB Low Ext3 50%");
-                AddPlot(new Stroke(Brushes.Red, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low Ext3");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High Ext3");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB High Ext3 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High Ext2");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB High Ext2 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High Ext1");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB High Ext1 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB High");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB Low Ext1 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low Ext1");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB Low Ext2 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low Ext2");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 1.0f), PlotStyle.Hash, "IB Low Ext3 50%");
+                AddPlot(new Stroke(Brushes.White, DashStyleHelper.Solid, 2.0f), PlotStyle.Line, "IB Low Ext3");
             }
             else if (State == State.Configure)
 			{
@@ -878,18 +869,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private LunarTick.InitialBalance[] cacheInitialBalance;
-		public LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return InitialBalance(Input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return InitialBalance(Input, sessionStartTime, sessionEndTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 
-		public LunarTick.InitialBalance InitialBalance(ISeries<double> input, DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public LunarTick.InitialBalance InitialBalance(ISeries<double> input, DateTime sessionStartTime, DateTime sessionEndTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
 			if (cacheInitialBalance != null)
 				for (int idx = 0; idx < cacheInitialBalance.Length; idx++)
-					if (cacheInitialBalance[idx] != null && cacheInitialBalance[idx].SessionStartTime == sessionStartTime && cacheInitialBalance[idx].SessionEndTime == sessionEndTime && cacheInitialBalance[idx].InitialBalanceDurationMinutes == initialBalanceDurationMinutes && cacheInitialBalance[idx].ExtensionLevels == extensionLevels && cacheInitialBalance[idx].ExtLevel1Multiplier == extLevel1Multiplier && cacheInitialBalance[idx].ExtLevel2Multiplier == extLevel2Multiplier && cacheInitialBalance[idx].ExtLevel3Multiplier == extLevel3Multiplier && cacheInitialBalance[idx].EqualsInput(input))
+					if (cacheInitialBalance[idx] != null && cacheInitialBalance[idx].SessionStartTime == sessionStartTime && cacheInitialBalance[idx].SessionEndTime == sessionEndTime && cacheInitialBalance[idx].ExtensionLevels == extensionLevels && cacheInitialBalance[idx].ExtLevel1Multiplier == extLevel1Multiplier && cacheInitialBalance[idx].ExtLevel2Multiplier == extLevel2Multiplier && cacheInitialBalance[idx].ExtLevel3Multiplier == extLevel3Multiplier && cacheInitialBalance[idx].EqualsInput(input))
 						return cacheInitialBalance[idx];
-			return CacheIndicator<LunarTick.InitialBalance>(new LunarTick.InitialBalance(){ SessionStartTime = sessionStartTime, SessionEndTime = sessionEndTime, InitialBalanceDurationMinutes = initialBalanceDurationMinutes, ExtensionLevels = extensionLevels, ExtLevel1Multiplier = extLevel1Multiplier, ExtLevel2Multiplier = extLevel2Multiplier, ExtLevel3Multiplier = extLevel3Multiplier }, input, ref cacheInitialBalance);
+			return CacheIndicator<LunarTick.InitialBalance>(new LunarTick.InitialBalance(){ SessionStartTime = sessionStartTime, SessionEndTime = sessionEndTime, ExtensionLevels = extensionLevels, ExtLevel1Multiplier = extLevel1Multiplier, ExtLevel2Multiplier = extLevel2Multiplier, ExtLevel3Multiplier = extLevel3Multiplier }, input, ref cacheInitialBalance);
 		}
 	}
 }
@@ -898,14 +889,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(Input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(Input, sessionStartTime, sessionEndTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 
-		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime sessionStartTime, DateTime sessionEndTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(input, sessionStartTime, sessionEndTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 	}
 }
@@ -914,14 +905,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(DateTime sessionStartTime, DateTime sessionEndTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(Input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(Input, sessionStartTime, sessionEndTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 
-		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime sessionStartTime, DateTime sessionEndTime, int initialBalanceDurationMinutes, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
+		public Indicators.LunarTick.InitialBalance InitialBalance(ISeries<double> input , DateTime sessionStartTime, DateTime sessionEndTime, NinjaTrader.NinjaScript.Indicators.LunarTick.InitialBalanceEnums.InitialBalanceExtensionLevels extensionLevels, double extLevel1Multiplier, double extLevel2Multiplier, double extLevel3Multiplier)
 		{
-			return indicator.InitialBalance(input, sessionStartTime, sessionEndTime, initialBalanceDurationMinutes, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
+			return indicator.InitialBalance(input, sessionStartTime, sessionEndTime, extensionLevels, extLevel1Multiplier, extLevel2Multiplier, extLevel3Multiplier);
 		}
 	}
 }
