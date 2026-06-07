@@ -538,7 +538,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     int startBarsAgo = 0;
                     if (!currentIBRegion.IsBackFilled)
                     {
-                        if (HideJoins)
+                        if (HideJoins && currentIBRegion.StartBarIndex > 0)
                             ClearPlots((CurrentBar - currentIBRegion.StartBarIndex) + 1);
 
                         for (int i = CurrentBar - currentIBRegion.StartBarIndex; i >= 0; i--)
@@ -601,7 +601,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         private void PopulatePlots(InitialBalanceRegion ibRegion, int barsAgo, bool showLabels)
         {
-            if (barsAgo >= IBHigh.Count)
+            if (barsAgo >= CurrentBar)
                 return;
 
             if (ExtendLevelsUntil == ExtendPlots.EndOfSession)
@@ -703,6 +703,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         private void ClearPlots(int barsAgo = 0)
         {
+            if (barsAgo > CurrentBar)
+                return;
+
             bool showExt1 = ExtensionLevels != InitialBalanceEnums.InitialBalanceExtensionLevels.None;
             bool showExt2 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Two || ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;
             bool showExt3 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;

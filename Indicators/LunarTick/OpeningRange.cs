@@ -544,7 +544,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     int startBarsAgo = 0;
                     if (!currentORRegion.IsBackFilled)
                     {
-                        if (HideJoins)
+                        if (HideJoins && currentORRegion.StartBarIndex > 0)
                             ClearPlots((CurrentBar - currentORRegion.StartBarIndex) + 1);
 
                         for (int i = CurrentBar - currentORRegion.StartBarIndex; i >= 0; i--)
@@ -607,7 +607,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         private void PopulatePlots(OpeningRangeRegion ibRegion, int barsAgo, bool showLabels)
         {
-            if (barsAgo >= ORHigh.Count)
+            if (barsAgo >= CurrentBar)
                 return;
 
             if (ExtendLevelsUntil == ExtendPlots.EndOfSession)
@@ -709,6 +709,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         private void ClearPlots(int barsAgo = 0)
         {
+            if (barsAgo > CurrentBar)
+                return;
+
             bool showExt1 = ExtensionLevels != OpeningRangeEnums.OpeningRangeExtensionLevels.None;
             bool showExt2 = ExtensionLevels == OpeningRangeEnums.OpeningRangeExtensionLevels.Two || ExtensionLevels == OpeningRangeEnums.OpeningRangeExtensionLevels.Three;
             bool showExt3 = ExtensionLevels == OpeningRangeEnums.OpeningRangeExtensionLevels.Three;
