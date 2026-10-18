@@ -15,16 +15,16 @@ using System.Reflection;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 {
-    [Gui.CategoryOrder("[01] Parameters", 1)]
-    [Gui.CategoryOrder("[02] Display", 2)]
-    [Gui.CategoryOrder("[03] Bars", 3)]
-    [Gui.CategoryOrder("[04] Developer", 4)]
-    [TypeConverter("NinjaTrader.NinjaScript.Indicators.LunarTick.VWAPDeluxeTypeConverter")]
-    public class VWAPDeluxe : Indicator
+    [Gui.CategoryOrder("Parameters", 1)]
+    [Gui.CategoryOrder("Display", 2)]
+    [Gui.CategoryOrder("Bars", 3)]
+    [Gui.CategoryOrder("Developer", 4)]
+    [TypeConverter("NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickVWAPTypeConverter")]
+    public class LunarTickVWAP : Indicator
     {
         #region Constants
 
-        public const string Version = "1.1.1";
+        public const string Version = "1.2.0";
 
         #endregion
 
@@ -38,18 +38,18 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         #region Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Reset interval", Order = 1, GroupName = "[01] Parameters")]
+        [Display(Name = "Reset interval", Order = 1, GroupName = "Parameters")]
         public NinjaTrader.NinjaScript.Indicators.VWAPResetInterval ResetInterval
         { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Resolution", Order = 2, GroupName = "[01] Parameters")]
+        [Display(Name = "Resolution", Order = 2, GroupName = "Parameters")]
         public NinjaTrader.NinjaScript.Indicators.VWAPResolution Resolution
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
         [NinjaScriptProperty]
-        [Display(Name = "Std Dev bands", Order = 3, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev bands", Order = 3, GroupName = "Parameters")]
         public NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations NumStandardDeviations
         {
             get => _numStandardDeviations;
@@ -69,24 +69,24 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Std Dev 1 multiplier", Order = 4, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev 1 multiplier", Order = 4, GroupName = "Parameters")]
         public double StdDev1Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Std Dev 2 multiplier", Order = 5, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev 2 multiplier", Order = 5, GroupName = "Parameters")]
         public double StdDev2Multiplier
         { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Std Dev 3 multiplier", Order = 6, GroupName = "[01] Parameters")]
+        [Display(Name = "Std Dev 3 multiplier", Order = 6, GroupName = "Parameters")]
         public double StdDev3Multiplier
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Std Dev 1 upper area color", Order = 1, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 1 upper area color", Order = 1, GroupName = "Display")]
         public Brush StdDev1UpperAreaColor
         { get; set; }
 
@@ -98,12 +98,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Std Dev 1 upper area opacity", Order = 2, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 1 upper area opacity", Order = 2, GroupName = "Display")]
         public int StdDev1UpperAreaOpacity
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Std Dev 1 lower area color", Order = 3, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 1 lower area color", Order = 3, GroupName = "Display")]
         public Brush StdDev1LowerAreaColor
         { get; set; }
 
@@ -115,12 +115,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Std Dev 1 lower area opacity", Order = 4, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 1 lower area opacity", Order = 4, GroupName = "Display")]
         public int StdDev1LowerAreaOpacity
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Std Dev 2 upper area color", Order = 5, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 2 upper area color", Order = 5, GroupName = "Display")]
         public Brush StdDev2UpperAreaColor
         { get; set; }
 
@@ -132,12 +132,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Std Dev 2 upper area opacity", Order = 6, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 2 upper area opacity", Order = 6, GroupName = "Display")]
         public int StdDev2UpperAreaOpacity
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Std Dev 2 lower area color", Order = 7, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 2 lower area color", Order = 7, GroupName = "Display")]
         public Brush StdDev2LowerAreaColor
         { get; set; }
 
@@ -149,12 +149,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Std Dev 2 lower area opacity", Order = 8, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 2 lower area opacity", Order = 8, GroupName = "Display")]
         public int StdDev2LowerAreaOpacity
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Std Dev 3 upper area color", Order = 9, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 3 upper area color", Order = 9, GroupName = "Display")]
         public Brush StdDev3UpperAreaColor
         { get; set; }
 
@@ -166,12 +166,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Std Dev 3 upper area opacity", Order = 10, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 3 upper area opacity", Order = 10, GroupName = "Display")]
         public int StdDev3UpperAreaOpacity
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Std Dev 3 lower area color", Order = 11, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 3 lower area color", Order = 11, GroupName = "Display")]
         public Brush StdDev3LowerAreaColor
         { get; set; }
 
@@ -183,17 +183,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Std Dev 3 lower area opacity", Order = 12, GroupName = "[02] Display")]
+        [Display(Name = "Std Dev 3 lower area opacity", Order = 12, GroupName = "Display")]
         public int StdDev3LowerAreaOpacity
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Color VWAP by price", Order = 13, GroupName = "[02] Display")]
+        [Display(Name = "Color VWAP by price", Order = 13, GroupName = "Display")]
         public bool ColorVWAPByPrice
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Color for above price", Order = 14, GroupName = "[02] Display")]
+        [Display(Name = "Color for above price", Order = 14, GroupName = "Display")]
         public Brush AbovePriceColor
         { get; set; }
 
@@ -205,7 +205,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [XmlIgnore]
-        [Display(Name = "Color for below price", Order = 15, GroupName = "[02] Display")]
+        [Display(Name = "Color for below price", Order = 15, GroupName = "Display")]
         public Brush BelowPriceColor
         { get; set; }
 
@@ -217,12 +217,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bars in balance region", Description = "Highlight the bars closing inside the Std Deviation 1 bands.", Order = 1, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bars in balance region", Description = "Highlight the bars closing inside the Std Deviation 1 bands.", Order = 1, GroupName = "Bars")]
         public bool HighlightBarsInBalanceRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Balance region up bars", Order = 2, GroupName = "[03] Bars")]
+        [Display(Name = "Balance region up bars", Order = 2, GroupName = "Bars")]
         public Brush BalanceRegionUpBarsColor
         { get; set; }
 
@@ -234,7 +234,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [XmlIgnore]
-        [Display(Name = "Balance region down bars", Order = 3, GroupName = "[03] Bars")]
+        [Display(Name = "Balance region down bars", Order = 3, GroupName = "Bars")]
         public Brush BalanceRegionDownBarsColor
         { get; set; }
 
@@ -246,12 +246,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bars in bullish imbalance region", Description = "Highlight the bars closing above the Std Deviation 1 Upper band.", Order = 4, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bars in bullish imbalance region", Description = "Highlight the bars closing above the Std Deviation 1 Upper band.", Order = 4, GroupName = "Bars")]
         public bool HighlightBarsInBullishImbalanceRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Bullish imbalance region up bars", Order = 5, GroupName = "[03] Bars")]
+        [Display(Name = "Bullish imbalance region up bars", Order = 5, GroupName = "Bars")]
         public Brush BullishImbalanceRegionUpBarsColor
         { get; set; }
 
@@ -263,7 +263,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [XmlIgnore]
-        [Display(Name = "Bullish imbalance region down bars", Order = 6, GroupName = "[03] Bars")]
+        [Display(Name = "Bullish imbalance region down bars", Order = 6, GroupName = "Bars")]
         public Brush BullishImbalanceRegionDownBarsColor
         { get; set; }
 
@@ -275,12 +275,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bars in bearish imbalance region", Description = "Highlight the bars closing below the Std Deviation 1 Lower band.", Order = 7, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bars in bearish imbalance region", Description = "Highlight the bars closing below the Std Deviation 1 Lower band.", Order = 7, GroupName = "Bars")]
         public bool HighlightBarsInBearishImbalanceRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Bearish imbalance region up bars", Order = 8, GroupName = "[03] Bars")]
+        [Display(Name = "Bearish imbalance region up bars", Order = 8, GroupName = "Bars")]
         public Brush BearishImbalanceRegionUpBarsColor
         { get; set; }
 
@@ -292,7 +292,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [XmlIgnore]
-        [Display(Name = "Bearish imbalance region down bars", Order = 9, GroupName = "[03] Bars")]
+        [Display(Name = "Bearish imbalance region down bars", Order = 9, GroupName = "Bars")]
         public Brush BearishImbalanceRegionDownBarsColor
         { get; set; }
 
@@ -304,12 +304,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight bar/VWAP interactions", Description = "Highlight the bars touching VWAP or any Std Deviation band.", Order = 10, GroupName = "[03] Bars")]
+        [Display(Name = "Highlight bar/VWAP interactions", Description = "Highlight the bars touching VWAP or any Std Deviation band.", Order = 10, GroupName = "Bars")]
         public bool HighlightBarVWAPInteractions
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Bar/VWAP interaction up bars", Order = 11, GroupName = "[03] Bars")]
+        [Display(Name = "Bar/VWAP interaction up bars", Order = 11, GroupName = "Bars")]
         public Brush BarVWAPInteractionUpBarsColor
         { get; set; }
 
@@ -321,7 +321,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [XmlIgnore]
-        [Display(Name = "Bar/VWAP interaction down bars", Order = 12, GroupName = "[03] Bars")]
+        [Display(Name = "Bar/VWAP interaction down bars", Order = 12, GroupName = "Bars")]
         public Brush BarVWAPInteractionDownBarsColor
         { get; set; }
 
@@ -334,11 +334,11 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [ReadOnly(true)]
         [XmlIgnore]
-        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "[04] Developer")]
+        [Display(Name = "Version", Description = "Version information.", Order = 1, GroupName = "Developer")]
         public string VersionInformation
         { get; set; }
 
-        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "[04] Developer")]
+        [Display(Name = "Debug", Description = "Toggle debug logging.", Order = 2, GroupName = "Developer")]
         public bool Debug
         { get; set; }
 
@@ -396,70 +396,70 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         #region Indicator methods
 
         protected override void OnStateChange()
-		{
+        {
             DebugPrint($"OnStateChange({State})");
 
             if (State == State.SetDefaults)
-			{
-				Description									= @"VWAP and standard deviation bands supporting bar/band coloring options.\n\nNOTE: Requires access to OrderFlow VWAP.";
-				Name										= "VWAP Deluxe";
-				Calculate									= Calculate.OnPriceChange;
-				IsOverlay									= true;
-				DisplayInDataBox							= true;
-				DrawOnPricePanel							= true;
-				DrawHorizontalGridLines						= true;
-				DrawVerticalGridLines						= true;
-				PaintPriceMarkers							= true;
-				ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
-                IsAutoScale                                 = false;
-				//Disable this property if your indicator requires custom values that cumulate with each new market data event. 
-				//See Help Guide for additional information.
-				IsSuspendedWhileInactive					= true;
+            {
+                Description = @"VWAP and standard deviation bands supporting bar/band coloring options.\n\nNOTE: Requires access to OrderFlow VWAP.";
+                Name = "LunarTick VWAP";
+                Calculate = Calculate.OnPriceChange;
+                IsOverlay = true;
+                DisplayInDataBox = true;
+                DrawOnPricePanel = true;
+                DrawHorizontalGridLines = true;
+                DrawVerticalGridLines = true;
+                PaintPriceMarkers = true;
+                ScaleJustification = NinjaTrader.Gui.Chart.ScaleJustification.Right;
+                IsAutoScale = false;
+                //Disable this property if your indicator requires custom values that cumulate with each new market data event. 
+                //See Help Guide for additional information.
+                IsSuspendedWhileInactive = true;
 
-                ResetInterval                               = VWAPResetInterval.Session;
-				Resolution                                  = VWAPResolution.Standard;
-				NumStandardDeviations                       = VWAPStandardDeviations.Three;
-				StdDev1Multiplier                           = 1;
-                StdDev2Multiplier                           = 2;
-                StdDev3Multiplier                           = 3;
+                ResetInterval = VWAPResetInterval.Session;
+                Resolution = VWAPResolution.Standard;
+                NumStandardDeviations = VWAPStandardDeviations.Three;
+                StdDev1Multiplier = 1;
+                StdDev2Multiplier = 2;
+                StdDev3Multiplier = 3;
 
-                StdDev1UpperAreaColor                       = Brushes.CornflowerBlue;
-                StdDev1UpperAreaOpacity                     = 50;
-                StdDev1LowerAreaColor                       = Brushes.CornflowerBlue;
-                StdDev1LowerAreaOpacity                     = 50;
+                StdDev1UpperAreaColor = Brushes.CornflowerBlue;
+                StdDev1UpperAreaOpacity = 50;
+                StdDev1LowerAreaColor = Brushes.CornflowerBlue;
+                StdDev1LowerAreaOpacity = 50;
 
-                StdDev2UpperAreaColor                       = Brushes.CornflowerBlue;
-                StdDev2UpperAreaOpacity                     = 40;
-                StdDev2LowerAreaColor                       = Brushes.CornflowerBlue;
-                StdDev2LowerAreaOpacity                     = 40;
+                StdDev2UpperAreaColor = Brushes.CornflowerBlue;
+                StdDev2UpperAreaOpacity = 40;
+                StdDev2LowerAreaColor = Brushes.CornflowerBlue;
+                StdDev2LowerAreaOpacity = 40;
 
-                StdDev3UpperAreaColor                       = Brushes.CornflowerBlue;
-                StdDev3UpperAreaOpacity                     = 30;
-                StdDev3LowerAreaColor                       = Brushes.CornflowerBlue;
-                StdDev3LowerAreaOpacity                     = 30;
+                StdDev3UpperAreaColor = Brushes.CornflowerBlue;
+                StdDev3UpperAreaOpacity = 30;
+                StdDev3LowerAreaColor = Brushes.CornflowerBlue;
+                StdDev3LowerAreaOpacity = 30;
 
-                ColorVWAPByPrice                            = false;
-                AbovePriceColor                             = Brushes.Red;
-                BelowPriceColor                             = Brushes.LimeGreen;
+                ColorVWAPByPrice = false;
+                AbovePriceColor = Brushes.Red;
+                BelowPriceColor = Brushes.LimeGreen;
 
-                HighlightBarsInBalanceRegion                = false;
-                BalanceRegionUpBarsColor                    = Brushes.LightGray;
-                BalanceRegionDownBarsColor                  = Brushes.DimGray;
+                HighlightBarsInBalanceRegion = false;
+                BalanceRegionUpBarsColor = Brushes.LightGray;
+                BalanceRegionDownBarsColor = Brushes.DimGray;
 
-                HighlightBarsInBullishImbalanceRegion       = false;
-                BullishImbalanceRegionUpBarsColor           = Brushes.LimeGreen;
-                BullishImbalanceRegionDownBarsColor         = Brushes.DarkGreen;
+                HighlightBarsInBullishImbalanceRegion = false;
+                BullishImbalanceRegionUpBarsColor = Brushes.LimeGreen;
+                BullishImbalanceRegionDownBarsColor = Brushes.DarkGreen;
 
-                HighlightBarsInBearishImbalanceRegion       = false;
-                BearishImbalanceRegionUpBarsColor           = Brushes.Red;
-                BearishImbalanceRegionDownBarsColor         = Brushes.DarkRed;
+                HighlightBarsInBearishImbalanceRegion = false;
+                BearishImbalanceRegionUpBarsColor = Brushes.Red;
+                BearishImbalanceRegionDownBarsColor = Brushes.DarkRed;
 
-                HighlightBarVWAPInteractions                = false;
-                BarVWAPInteractionUpBarsColor               = Brushes.Yellow;
-                BarVWAPInteractionDownBarsColor             = Brushes.Goldenrod;
+                HighlightBarVWAPInteractions = false;
+                BarVWAPInteractionUpBarsColor = Brushes.Yellow;
+                BarVWAPInteractionDownBarsColor = Brushes.Goldenrod;
 
-                VersionInformation                          = $"{Version} - {Assembly.GetAssembly(typeof(VWAPDeluxe)).GetName().Version}";
-                Debug										= false;
+                VersionInformation = $"{Version} - {Assembly.GetAssembly(typeof(LunarTickVWAP)).GetName().Version}";
+                Debug = false;
 
                 AddPlot(new Stroke(Brushes.Cyan, 3), PlotStyle.Line, "VWAP");
 
@@ -480,7 +480,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 }
             }
             else if (State == State.DataLoaded)
-			{
+            {
                 _orderFlowVWAP = OrderFlowVWAP(Resolution, Bars.TradingHours, NumStandardDeviations, StdDev1Multiplier, StdDev2Multiplier, StdDev3Multiplier);
                 if (_orderFlowVWAP != null)
                 {
@@ -493,8 +493,8 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             }
         }
 
-		protected override void OnBarUpdate()
-		{
+        protected override void OnBarUpdate()
+        {
             if (CurrentBar < 1)
                 return;
             if (_orderFlowVWAP == null)
@@ -623,21 +623,21 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (Debug)
             {
                 if (Instrument != null && !string.IsNullOrWhiteSpace(Instrument.FullName))
-                    Print($"VWAPDeluxe[{Instrument.FullName}]: {msg}");
+                    Print($"LunarTickVWAP[{Instrument.FullName}]: {msg}");
                 else
-                    Print($"VWAPDeluxe: {msg}");
+                    Print($"LunarTickVWAP: {msg}");
             }
         }
 
         #endregion
     }
 
-    public class VWAPDeluxeTypeConverter : IndicatorBaseConverter
+    public class LunarTickVWAPTypeConverter : IndicatorBaseConverter
     {
         public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object component, Attribute[] attrs)
         {
             // We need the indicator instance which actually exists on the grid
-            VWAPDeluxe indicator = component as VWAPDeluxe;
+            LunarTickVWAP indicator = component as LunarTickVWAP;
 
             // base.GetProperties ensures we have all the properties (and associated property grid editors)
             // NinjaTrader internal logic determines for a given indicator
@@ -819,13 +819,13 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
     public class BoolRequiringStdDeviationsPropertyDescriptor : PropertyDescriptor
     {
         // Need the instance on the property grid to check the show/hide toggle value
-        private VWAPDeluxe indicatorInstance;
+        private LunarTickVWAP indicatorInstance;
 
         private PropertyDescriptor property;
 
         // The base instance constructor helps store the default Name and Attributes (Such as DisplayAttribute.Name, .GroupName, .Order)
         // Otherwise those details would be lost when we converted the PropertyDescriptor to the new custom ReadOnlyDescriptor
-        public BoolRequiringStdDeviationsPropertyDescriptor(VWAPDeluxe indicator, PropertyDescriptor propertyDescriptor) : base(propertyDescriptor.Name, propertyDescriptor.Attributes.OfType<Attribute>().ToArray())
+        public BoolRequiringStdDeviationsPropertyDescriptor(LunarTickVWAP indicator, PropertyDescriptor propertyDescriptor) : base(propertyDescriptor.Name, propertyDescriptor.Attributes.OfType<Attribute>().ToArray())
         {
             indicatorInstance = indicator;
             property = propertyDescriptor;
@@ -834,7 +834,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         // Stores the current value of the property on the indicator
         public override object GetValue(object component)
         {
-            VWAPDeluxe targetInstance = component as VWAPDeluxe;
+            LunarTickVWAP targetInstance = component as LunarTickVWAP;
 
             if (targetInstance == null)
                 return null;
@@ -854,7 +854,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         // Updates the current value of the property on the indicator
         public override void SetValue(object component, object value)
         {
-            VWAPDeluxe targetInstance = component as VWAPDeluxe;
+            LunarTickVWAP targetInstance = component as LunarTickVWAP;
 
             if (targetInstance == null)
                 return;
@@ -884,7 +884,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         { return true; }
 
         public override Type ComponentType
-        { get { return typeof(VWAPDeluxeTypeConverter); } }
+        { get { return typeof(LunarTickVWAPTypeConverter); } }
 
         public override Type PropertyType
         { get { return typeof(bool); } }
@@ -903,19 +903,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private LunarTick.VWAPDeluxe[] cacheVWAPDeluxe;
-		public LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		private LunarTick.LunarTickVWAP[] cacheLunarTickVWAP;
+		public LunarTick.LunarTickVWAP LunarTickVWAP(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return VWAPDeluxe(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return LunarTickVWAP(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 
-		public LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input, NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public LunarTick.LunarTickVWAP LunarTickVWAP(ISeries<double> input, NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			if (cacheVWAPDeluxe != null)
-				for (int idx = 0; idx < cacheVWAPDeluxe.Length; idx++)
-					if (cacheVWAPDeluxe[idx] != null && cacheVWAPDeluxe[idx].ResetInterval == resetInterval && cacheVWAPDeluxe[idx].Resolution == resolution && cacheVWAPDeluxe[idx].NumStandardDeviations == numStandardDeviations && cacheVWAPDeluxe[idx].StdDev1Multiplier == stdDev1Multiplier && cacheVWAPDeluxe[idx].StdDev2Multiplier == stdDev2Multiplier && cacheVWAPDeluxe[idx].StdDev3Multiplier == stdDev3Multiplier && cacheVWAPDeluxe[idx].EqualsInput(input))
-						return cacheVWAPDeluxe[idx];
-			return CacheIndicator<LunarTick.VWAPDeluxe>(new LunarTick.VWAPDeluxe(){ ResetInterval = resetInterval, Resolution = resolution, NumStandardDeviations = numStandardDeviations, StdDev1Multiplier = stdDev1Multiplier, StdDev2Multiplier = stdDev2Multiplier, StdDev3Multiplier = stdDev3Multiplier }, input, ref cacheVWAPDeluxe);
+			if (cacheLunarTickVWAP != null)
+				for (int idx = 0; idx < cacheLunarTickVWAP.Length; idx++)
+					if (cacheLunarTickVWAP[idx] != null && cacheLunarTickVWAP[idx].ResetInterval == resetInterval && cacheLunarTickVWAP[idx].Resolution == resolution && cacheLunarTickVWAP[idx].NumStandardDeviations == numStandardDeviations && cacheLunarTickVWAP[idx].StdDev1Multiplier == stdDev1Multiplier && cacheLunarTickVWAP[idx].StdDev2Multiplier == stdDev2Multiplier && cacheLunarTickVWAP[idx].StdDev3Multiplier == stdDev3Multiplier && cacheLunarTickVWAP[idx].EqualsInput(input))
+						return cacheLunarTickVWAP[idx];
+			return CacheIndicator<LunarTick.LunarTickVWAP>(new LunarTick.LunarTickVWAP(){ ResetInterval = resetInterval, Resolution = resolution, NumStandardDeviations = numStandardDeviations, StdDev1Multiplier = stdDev1Multiplier, StdDev2Multiplier = stdDev2Multiplier, StdDev3Multiplier = stdDev3Multiplier }, input, ref cacheLunarTickVWAP);
 		}
 	}
 }
@@ -924,14 +924,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.LunarTickVWAP LunarTickVWAP(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.LunarTickVWAP(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.LunarTickVWAP LunarTickVWAP(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.LunarTickVWAP(input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 	}
 }
@@ -940,14 +940,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.LunarTickVWAP LunarTickVWAP(NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.LunarTickVWAP(Input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 
-		public Indicators.LunarTick.VWAPDeluxe VWAPDeluxe(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
+		public Indicators.LunarTick.LunarTickVWAP LunarTickVWAP(ISeries<double> input , NinjaTrader.NinjaScript.Indicators.VWAPResetInterval resetInterval, NinjaTrader.NinjaScript.Indicators.VWAPResolution resolution, NinjaTrader.NinjaScript.Indicators.VWAPStandardDeviations numStandardDeviations, double stdDev1Multiplier, double stdDev2Multiplier, double stdDev3Multiplier)
 		{
-			return indicator.VWAPDeluxe(input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
+			return indicator.LunarTickVWAP(input, resetInterval, resolution, numStandardDeviations, stdDev1Multiplier, stdDev2Multiplier, stdDev3Multiplier);
 		}
 	}
 }
