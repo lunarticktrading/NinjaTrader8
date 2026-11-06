@@ -50,15 +50,20 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 TrendType = trendType;
             }
 
-            public string GetRegionTag(string prefix)
+            public string GetFastMediumRegionTag(string prefix)
             {
-                return string.Format("{0}{1}Cloud{2}", (string.IsNullOrWhiteSpace(prefix) ? string.Empty : prefix), TrendType, StartBarIndex);
+                return string.Format("{0}{1}FastMediumCloud{2}", (string.IsNullOrWhiteSpace(prefix) ? string.Empty : prefix), TrendType, StartBarIndex);
+            }
+
+            public string GetFastSlowRegionTag(string prefix)
+            {
+                return string.Format("{0}{1}FastSlowCloud{2}", (string.IsNullOrWhiteSpace(prefix) ? string.Empty : prefix), TrendType, StartBarIndex);
             }
         }
 
         #region Constants
 
-        public const string Version = "1.0.1";
+        public const string Version = "1.1.0";
         private const string DrawObjectPrefix = "LunarTickTrend_";
 
         #endregion
@@ -66,8 +71,11 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         #region Members
 
         private SMA _fastSMA;
-        private EMA _fastEMA;
+        private SMA _mediumSMA;
         private SMA _slowSMA;
+
+        private EMA _fastEMA;
+        private EMA _mediumEMA;
         private EMA _slowEMA;
 
         private Series<TrendType> _trendType;
@@ -75,10 +83,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         private Series<bool> _shortEntrySignal;
         private List<RegionInfo> _regions = new List<RegionInfo>();
 
+        private Brush _fastBrush;
         private Brush _fastBullishBrush;
         private Brush _fastBearishBrush;
         private Brush _fastRetracementBrush;
 
+        private Brush _mediumBrush;
+        private Brush _mediumBullishBrush;
+        private Brush _mediumBearishBrush;
+        private Brush _mediumRetracementBrush;
+
+        private Brush _slowBrush;
         private Brush _slowBullishBrush;
         private Brush _slowBearishBrush;
         private Brush _slowRetracementBrush;
@@ -112,7 +127,19 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [NinjaScriptProperty]
         [Range(1, int.MaxValue)]
-        [Display(Name = "Slow Period", Description = "The period of the slow Moving Average.", Order = 5, GroupName = "Parameters")]
+        [Display(Name = "Medium Period", Description = "The period of the medium Moving Average.", Order = 5, GroupName = "Parameters")]
+        public int MediumPeriod
+        { get; set; }
+
+        [NinjaScriptProperty]
+        [RefreshProperties(RefreshProperties.All)]
+        [Display(Name = "Show Slow Moving Average", Description = "Show the slow Moving Average.", Order = 6, GroupName = "Parameters")]
+        public bool ShowSlowMovingAverage
+        { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1, int.MaxValue)]
+        [Display(Name = "Slow Period", Description = "The period of the slow Moving Average.", Order = 7, GroupName = "Parameters")]
         public int SlowPeriod
         { get; set; }
 
@@ -157,18 +184,27 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             set { RetracementCloudBrush = Serialize.StringToBrush(value); }
         }
 
-        [Range(0, 100)]
-        [Display(Name = "Fast Opacity", Description = "The opacity of the fast Moving Average (0 = completely transparent, 100 = no opacity).", Order = 5, GroupName = "Display")]
-        public int FastOpacity
+        [Display(Name = "Lines Use Cloud Color", Description = "Use the cloud color for Moving Averages.", Order = 5, GroupName = "Display")]
+        public bool LinesUseCloudColor
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "Slow Opacity", Description = "The opacity of the slow Moving Average (0 = completely transparent, 100 = no opacity).", Order = 6, GroupName = "Display")]
-        public int SlowOpacity
+        [Display(Name = "Fast Line Opacity", Description = "The opacity of the fast Moving Average (0 = completely transparent, 100 = no opacity).", Order = 6, GroupName = "Display")]
+        public int FastLineOpacity
         { get; set; }
 
         [Range(0, 100)]
-        [Display(Name = "Cloud Opacity", Description = "The opacity of the cloud (0 = completely transparent, 100 = no opacity).", Order = 7, GroupName = "Display")]
+        [Display(Name = "Medium Line Opacity", Description = "The opacity of the medium Moving Average (0 = completely transparent, 100 = no opacity).", Order = 7, GroupName = "Display")]
+        public int MediumLineOpacity
+        { get; set; }
+
+        [Range(0, 100)]
+        [Display(Name = "Slow Line Opacity", Description = "The opacity of the slow Moving Average (0 = completely transparent, 100 = no opacity).", Order = 8, GroupName = "Display")]
+        public int SlowLineOpacity
+        { get; set; }
+
+        [Range(0, 100)]
+        [Display(Name = "Cloud Opacity", Description = "The opacity of the cloud (0 = completely transparent, 100 = no opacity).", Order = 9, GroupName = "Display")]
         public int CloudOpacity
         { get; set; }
 
@@ -222,16 +258,23 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         [Browsable(false)]
         [XmlIgnore]
-        public Series<double> SlowMA
+        public Series<double> MediumMA
         {
             get { return Values[1]; }
         }
 
         [Browsable(false)]
         [XmlIgnore]
-        public Series<double> Signals
+        public Series<double> SlowMA
         {
             get { return Values[2]; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore]
+        public Series<double> Signals
+        {
+            get { return Values[3]; }
         }
 
         #endregion
@@ -244,7 +287,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
             if (State == State.SetDefaults)
             {
-                Description = @"Trend cloud based on two fast/slow moving averages.";
+                Description = @"Trend cloud based on two fast/medium moving averages.";
                 Name = "LunarTick Trend";
                 Calculate = Calculate.OnPriceChange;
                 IsOverlay = true;
@@ -260,13 +303,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 CustomTimeframe = 5;
                 MAType = NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum.EMA;
                 FastPeriod = 9;
-                SlowPeriod = 21;
+                MediumPeriod = 21;
+                ShowSlowMovingAverage = false;
+                SlowPeriod = 50;
                 BullishCloudBrush = Brushes.Green;
                 BearishCloudBrush = Brushes.Red;
                 ShowRetracements = false;
                 RetracementCloudBrush = Brushes.Yellow;
-                FastOpacity = 100;
-                SlowOpacity = 0;
+                LinesUseCloudColor = true;
+                FastLineOpacity = 100;
+                MediumLineOpacity = 100;
+                SlowLineOpacity = 100;
                 CloudOpacity = 40;
                 EnableSignals = false;
                 SignalOffset = 10;
@@ -278,30 +325,50 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 VersionInformation = $"{Version} - {Assembly.GetAssembly(typeof(LunarTickTrend)).GetName().Version}";
                 Debug = false;
 
-                AddPlot(new Stroke(Brushes.White, 2), PlotStyle.Line, "FastMA");
-                AddPlot(new Stroke(Brushes.White, 2), PlotStyle.Line, "SlowMA");
+                AddPlot(new Stroke(Brushes.Green, 2), PlotStyle.Line, "FastMA");
+                AddPlot(new Stroke(Brushes.Yellow, 2), PlotStyle.Line, "MediumMA");
+                AddPlot(new Stroke(Brushes.Red, 2), PlotStyle.Line, "SlowMA");
                 AddPlot(Brushes.Transparent, "Signals");
             }
             else if (State == State.Configure)
             {
+                _fastBrush = Plots[0].Brush.Clone();
+                _fastBrush.Opacity = FastLineOpacity / 100.0;
+                _fastBrush.Freeze();
                 _fastBullishBrush = BullishCloudBrush.Clone();
-                _fastBullishBrush.Opacity = FastOpacity / 100.0;
+                _fastBullishBrush.Opacity = FastLineOpacity / 100.0;
                 _fastBullishBrush.Freeze();
                 _fastBearishBrush = BearishCloudBrush.Clone();
-                _fastBearishBrush.Opacity = FastOpacity / 100.0;
+                _fastBearishBrush.Opacity = FastLineOpacity / 100.0;
                 _fastBearishBrush.Freeze();
                 _fastRetracementBrush = RetracementCloudBrush.Clone();
-                _fastRetracementBrush.Opacity = FastOpacity / 100.0;
+                _fastRetracementBrush.Opacity = FastLineOpacity / 100.0;
                 _fastRetracementBrush.Freeze();
 
+                _mediumBrush = Plots[1].Brush.Clone();
+                _mediumBrush.Opacity = MediumLineOpacity / 100.0;
+                _mediumBrush.Freeze();
+                _mediumBullishBrush = BullishCloudBrush.Clone();
+                _mediumBullishBrush.Opacity = MediumLineOpacity / 100.0;
+                _mediumBullishBrush.Freeze();
+                _mediumBearishBrush = BearishCloudBrush.Clone();
+                _mediumBearishBrush.Opacity = MediumLineOpacity / 100.0;
+                _mediumBearishBrush.Freeze();
+                _mediumRetracementBrush = RetracementCloudBrush.Clone();
+                _mediumRetracementBrush.Opacity = MediumLineOpacity / 100.0;
+                _mediumRetracementBrush.Freeze();
+
+                _slowBrush = Plots[2].Brush.Clone();
+                _slowBrush.Opacity = SlowLineOpacity / 100.0;
+                _slowBrush.Freeze();
                 _slowBullishBrush = BullishCloudBrush.Clone();
-                _slowBullishBrush.Opacity = SlowOpacity / 100.0;
+                _slowBullishBrush.Opacity = SlowLineOpacity / 100.0;
                 _slowBullishBrush.Freeze();
                 _slowBearishBrush = BearishCloudBrush.Clone();
-                _slowBearishBrush.Opacity = SlowOpacity / 100.0;
+                _slowBearishBrush.Opacity = SlowLineOpacity / 100.0;
                 _slowBearishBrush.Freeze();
                 _slowRetracementBrush = RetracementCloudBrush.Clone();
-                _slowRetracementBrush.Opacity = SlowOpacity / 100.0;
+                _slowRetracementBrush.Opacity = SlowLineOpacity / 100.0;
                 _slowRetracementBrush.Freeze();
 
                 // Disable IsSuspendedWhileInactive if alerts are enabled.
@@ -317,11 +384,21 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             }
             else if (State == State.DataLoaded)
             {
-                int barsInProgress = UseCustomTimeframe ? 1 : 0;
-                _fastSMA = SMA(BarsArray[barsInProgress], FastPeriod);
-                _fastEMA = EMA(BarsArray[barsInProgress], FastPeriod);
-                _slowSMA = SMA(BarsArray[barsInProgress], SlowPeriod);
-                _slowEMA = EMA(BarsArray[barsInProgress], SlowPeriod);
+                int maBarsInProgress = UseCustomTimeframe ? 1 : 0;
+                if (MAType == MATypeEnum.SMA)
+                {
+                    _fastSMA = SMA(BarsArray[maBarsInProgress], FastPeriod);
+                    _mediumSMA = SMA(BarsArray[maBarsInProgress], MediumPeriod);
+                    if (ShowSlowMovingAverage)
+                        _slowSMA = SMA(BarsArray[maBarsInProgress], SlowPeriod);
+                }
+                else if (MAType == MATypeEnum.EMA)
+                {
+                    _fastEMA = EMA(BarsArray[maBarsInProgress], FastPeriod);
+                    _mediumEMA = EMA(BarsArray[maBarsInProgress], MediumPeriod);
+                    if (ShowSlowMovingAverage)
+                        _slowEMA = EMA(BarsArray[maBarsInProgress], SlowPeriod);
+                }
             }
         }
 
@@ -332,7 +409,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 if (State == State.SetDefaults)
                     return DefaultName;
 
-                return Name + "(" + Instrument.FullName + " (" + (UseCustomTimeframe ? BarsPeriods[1] : BarsPeriods[0]) + ")," + FastPeriod + "," + SlowPeriod + "," + MAType + ")";
+                return Name + "(" + Instrument.FullName + " (" + (UseCustomTimeframe ? BarsPeriods[1] : BarsPeriods[0]) + ")," + FastPeriod + "," + MediumPeriod + "," + SlowPeriod + "," + MAType + ")";
             }
         }
 
@@ -345,19 +422,31 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             _shortEntrySignal[0] = false;
             Signals[0] = 0;
 
-            if (CurrentBar < Math.Max(FastPeriod, SlowPeriod))
+            int maBarsInProgress = UseCustomTimeframe ? 1 : 0;
+            if (CurrentBars[maBarsInProgress] < Math.Max(FastPeriod, MediumPeriod))
+                return;
+            if (ShowSlowMovingAverage && (CurrentBars[maBarsInProgress] < Math.Max(FastPeriod, SlowPeriod)))
                 return;
 
-            double fastMA = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum.EMA) ? (_fastEMA[0]) : (_fastSMA[0]);
-            double slowMA = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum.EMA) ? (_slowEMA[0]) : (_slowSMA[0]);
-
-            FastMA[0] = fastMA;
-            SlowMA[0] = slowMA;
+            FastMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum.EMA) ? (_fastEMA[0]) : (_fastSMA[0]);
+            MediumMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum.EMA) ? (_mediumEMA[0]) : (_mediumSMA[0]);
+            if (ShowSlowMovingAverage)
+                SlowMA[0] = (MAType == NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum.EMA) ? (_slowEMA[0]) : (_slowSMA[0]);
 
             _trendType[0] = GetTrendType(0, ShowRetracements);
 
-            PlotBrushes[0][0] = GetFastTrendBrush(_trendType[0]);
-            PlotBrushes[1][0] = GetSlowTrendBrush(_trendType[0]);
+            if (LinesUseCloudColor)
+            {
+                PlotBrushes[0][0] = GetFastTrendBrush(_trendType[0]);
+                PlotBrushes[1][0] = GetMediumTrendBrush(_trendType[0]);
+                PlotBrushes[2][0] = GetSlowTrendBrush(_trendType[0]);
+            }
+            else
+            {
+                PlotBrushes[0][0] = _fastBrush;
+                PlotBrushes[1][0] = _mediumBrush;
+                PlotBrushes[2][0] = _slowBrush;
+            }
 
             if (!IsVisible)
                 return;
@@ -371,7 +460,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 string longEntrySignalTag = string.Format("{0}LongEntry{1}", SignalPrefix, CurrentBar);
                 string shortEntrySignalTag = string.Format("{0}ShortEntry{1}", SignalPrefix, CurrentBar);
 
-                if (FastMA[0] >= SlowMA[0] && FastMA[1] < SlowMA[1])
+                if (FastMA[0] >= MediumMA[0] && FastMA[1] < MediumMA[1])
                 {
                     // LONG entry signal.
                     RemoveDrawObject(shortEntrySignalTag);
@@ -381,10 +470,10 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                         longEntrySignalTag,
                         true,
                         barTime,
-                        Math.Min(Math.Min(FastMA[0], SlowMA[0]), Low[0]) - (SignalOffset * TickSize),
+                        Math.Min(Math.Min(FastMA[0], MediumMA[0]), Low[0]) - (SignalOffset * TickSize),
                         BullishCloudBrush);
                 }
-                else if (FastMA[0] <= SlowMA[0] && FastMA[1] > SlowMA[1])
+                else if (FastMA[0] <= MediumMA[0] && FastMA[1] > MediumMA[1])
                 {
                     // SHORT entry signal.
                     RemoveDrawObject(longEntrySignalTag);
@@ -394,7 +483,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                         shortEntrySignalTag,
                         true,
                         barTime,
-                        Math.Max(Math.Max(FastMA[0], SlowMA[0]), High[0]) + (SignalOffset * TickSize),
+                        Math.Max(Math.Max(FastMA[0], MediumMA[0]), High[0]) + (SignalOffset * TickSize),
                         BearishCloudBrush);
                 }
                 else
@@ -434,9 +523,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if ((CurrentBar - barsAgo) < 0)
                 return result;
 
-            if (FastMA[barsAgo] > SlowMA[barsAgo])
+            if (FastMA[barsAgo] > MediumMA[barsAgo])
                 result = TrendType.Bullish;
-            else if (FastMA[barsAgo] < SlowMA[barsAgo])
+            else if (FastMA[barsAgo] < MediumMA[barsAgo])
                 result = TrendType.Bearish;
             else
                 result = GetTrendType(barsAgo + 1, false);
@@ -462,6 +551,21 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     return _fastBearishBrush;
                 case TrendType.Retracement:
                     return _fastRetracementBrush;
+                default:
+                    return Brushes.Transparent;
+            }
+        }
+
+        private Brush GetMediumTrendBrush(TrendType trendType)
+        {
+            switch (trendType)
+            {
+                case TrendType.Bullish:
+                    return _mediumBullishBrush;
+                case TrendType.Bearish:
+                    return _mediumBearishBrush;
+                case TrendType.Retracement:
+                    return _mediumRetracementBrush;
                 default:
                     return Brushes.Transparent;
             }
@@ -511,7 +615,10 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             // If current region was created for the current live bar, and bar has changed trend then delete it.
             if (currRegionInfo.StartBarIndex == CurrentBar && currRegionInfo.TrendType != currTrend)
             {
-                RemoveDrawObject(currRegionInfo.GetRegionTag(drawingObjectPrefix));
+                if (ShowSlowMovingAverage)
+                    RemoveDrawObject(currRegionInfo.GetFastSlowRegionTag(drawingObjectPrefix));
+                RemoveDrawObject(currRegionInfo.GetFastMediumRegionTag(drawingObjectPrefix));
+
                 _regions.RemoveAt(_regions.Count - 1);
                 if (_regions.Count == 0)
                     _regions.Add(new RegionInfo(CurrentBar, currTrend));
@@ -530,7 +637,9 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             {
                 int startBarsAgo = CurrentBar - currRegionInfo.StartBarIndex;
                 Brush areaBrush = GetTrendBrush(currRegionInfo.TrendType);
-                Draw.Region(owner, currRegionInfo.GetRegionTag(drawingObjectPrefix), startBarsAgo + 1, 0, FastMA, SlowMA, Brushes.Transparent, areaBrush, CloudOpacity);
+                if (ShowSlowMovingAverage)
+                    Draw.Region(owner, currRegionInfo.GetFastSlowRegionTag(drawingObjectPrefix), startBarsAgo + 1, 0, FastMA, SlowMA, Brushes.Transparent, areaBrush, CloudOpacity);
+                Draw.Region(owner, currRegionInfo.GetFastMediumRegionTag(drawingObjectPrefix), startBarsAgo + 1, 0, FastMA, MediumMA, Brushes.Transparent, areaBrush, CloudOpacity);
             }
         }
 
@@ -571,6 +680,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             if (indicator.UseCustomTimeframe)
             {
                 propertyDescriptorCollection.Add(customTimeframePropertyDesc);
+            }
+
+            // Show/hide properties related to ShowSlowMovingAverage
+            PropertyDescriptor slowPeriodPropertyDesc = propertyDescriptorCollection["SlowPeriod"];
+            PropertyDescriptor slowLineOpacityPropertyDesc = propertyDescriptorCollection["SlowLineOpacity"];
+            propertyDescriptorCollection.Remove(slowPeriodPropertyDesc);
+            propertyDescriptorCollection.Remove(slowLineOpacityPropertyDesc);
+            if (indicator.ShowSlowMovingAverage)
+            {
+                propertyDescriptorCollection.Add(slowPeriodPropertyDesc);
+                propertyDescriptorCollection.Add(slowLineOpacityPropertyDesc);
             }
 
             // Show/hide properties related to ShowRetracements
@@ -622,18 +742,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private LunarTick.LunarTickTrend[] cacheLunarTickTrend;
-		public LunarTick.LunarTickTrend LunarTickTrend(bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod)
+		public LunarTick.LunarTickTrend LunarTickTrend(bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int mediumPeriod, bool showSlowMovingAverage, int slowPeriod)
 		{
-			return LunarTickTrend(Input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, slowPeriod);
+			return LunarTickTrend(Input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, mediumPeriod, showSlowMovingAverage, slowPeriod);
 		}
 
-		public LunarTick.LunarTickTrend LunarTickTrend(ISeries<double> input, bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod)
+		public LunarTick.LunarTickTrend LunarTickTrend(ISeries<double> input, bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int mediumPeriod, bool showSlowMovingAverage, int slowPeriod)
 		{
 			if (cacheLunarTickTrend != null)
 				for (int idx = 0; idx < cacheLunarTickTrend.Length; idx++)
-					if (cacheLunarTickTrend[idx] != null && cacheLunarTickTrend[idx].UseCustomTimeframe == useCustomTimeframe && cacheLunarTickTrend[idx].CustomTimeframe == customTimeframe && cacheLunarTickTrend[idx].MAType == mAType && cacheLunarTickTrend[idx].FastPeriod == fastPeriod && cacheLunarTickTrend[idx].SlowPeriod == slowPeriod && cacheLunarTickTrend[idx].EqualsInput(input))
+					if (cacheLunarTickTrend[idx] != null && cacheLunarTickTrend[idx].UseCustomTimeframe == useCustomTimeframe && cacheLunarTickTrend[idx].CustomTimeframe == customTimeframe && cacheLunarTickTrend[idx].MAType == mAType && cacheLunarTickTrend[idx].FastPeriod == fastPeriod && cacheLunarTickTrend[idx].MediumPeriod == mediumPeriod && cacheLunarTickTrend[idx].ShowSlowMovingAverage == showSlowMovingAverage && cacheLunarTickTrend[idx].SlowPeriod == slowPeriod && cacheLunarTickTrend[idx].EqualsInput(input))
 						return cacheLunarTickTrend[idx];
-			return CacheIndicator<LunarTick.LunarTickTrend>(new LunarTick.LunarTickTrend(){ UseCustomTimeframe = useCustomTimeframe, CustomTimeframe = customTimeframe, MAType = mAType, FastPeriod = fastPeriod, SlowPeriod = slowPeriod }, input, ref cacheLunarTickTrend);
+			return CacheIndicator<LunarTick.LunarTickTrend>(new LunarTick.LunarTickTrend(){ UseCustomTimeframe = useCustomTimeframe, CustomTimeframe = customTimeframe, MAType = mAType, FastPeriod = fastPeriod, MediumPeriod = mediumPeriod, ShowSlowMovingAverage = showSlowMovingAverage, SlowPeriod = slowPeriod }, input, ref cacheLunarTickTrend);
 		}
 	}
 }
@@ -642,14 +762,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod)
+		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int mediumPeriod, bool showSlowMovingAverage, int slowPeriod)
 		{
-			return indicator.LunarTickTrend(Input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, slowPeriod);
+			return indicator.LunarTickTrend(Input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, mediumPeriod, showSlowMovingAverage, slowPeriod);
 		}
 
-		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(ISeries<double> input , bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod)
+		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(ISeries<double> input , bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int mediumPeriod, bool showSlowMovingAverage, int slowPeriod)
 		{
-			return indicator.LunarTickTrend(input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, slowPeriod);
+			return indicator.LunarTickTrend(input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, mediumPeriod, showSlowMovingAverage, slowPeriod);
 		}
 	}
 }
@@ -658,14 +778,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod)
+		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int mediumPeriod, bool showSlowMovingAverage, int slowPeriod)
 		{
-			return indicator.LunarTickTrend(Input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, slowPeriod);
+			return indicator.LunarTickTrend(Input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, mediumPeriod, showSlowMovingAverage, slowPeriod);
 		}
 
-		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(ISeries<double> input , bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int slowPeriod)
+		public Indicators.LunarTick.LunarTickTrend LunarTickTrend(ISeries<double> input , bool useCustomTimeframe, int customTimeframe, NinjaTrader.NinjaScript.Indicators.LunarTick.LunarTickTrendEnums.MATypeEnum mAType, int fastPeriod, int mediumPeriod, bool showSlowMovingAverage, int slowPeriod)
 		{
-			return indicator.LunarTickTrend(input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, slowPeriod);
+			return indicator.LunarTickTrend(input, useCustomTimeframe, customTimeframe, mAType, fastPeriod, mediumPeriod, showSlowMovingAverage, slowPeriod);
 		}
 	}
 }
