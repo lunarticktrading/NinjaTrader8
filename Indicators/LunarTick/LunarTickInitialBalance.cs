@@ -176,7 +176,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.3.1";
+        public const string Version = "1.3.2";
         public const int InitialBalanceDurationMinutes = 60;
 
         #endregion
@@ -184,7 +184,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         #region Members
 
         private List<InitialBalanceRegion> _ibRegions = new List<InitialBalanceRegion>();
-        private Brush _highlightTimeframeBrush;
         private SimpleFont _labelFont;
         private int _decimalPlaces = 0;
         private int _lastBarUpdated = -1;
@@ -319,34 +318,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight IB Timeframe", Order = 12, GroupName = "Display")]
-        public bool HighlightIBTimeframe
-        { get; set; }
-
-        [XmlIgnore]
-        [Display(Name = "Highlight IB Timeframe Color", Order = 13, GroupName = "Display")]
-        public Brush HighlightIBTimeframeColor
-        { get; set; }
-
-        [Browsable(false)]
-        public string HighlightIBTimeframeColorSerializable
-        {
-            get { return Serialize.BrushToString(HighlightIBTimeframeColor); }
-            set { HighlightIBTimeframeColor = Serialize.StringToBrush(value); }
-        }
-
-        [Range(0, 100)]
-        [Display(Name = "Highlight IB Timeframe Opacity", Order = 14, GroupName = "Display")]
-        public int HighlightIBTimeframeOpacity
-        { get; set; }
-
-        [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight IB Region", Order = 15, GroupName = "Display")]
+        [Display(Name = "Highlight IB Region", Order = 12, GroupName = "Display")]
         public bool HighlightIBRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight IB Region Color", Order = 16, GroupName = "Display")]
+        [Display(Name = "Highlight IB Region Color", Order = 13, GroupName = "Display")]
         public Brush HighlightIBRegionColor
         { get; set; }
 
@@ -358,17 +335,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight IB Region Opacity", Order = 17, GroupName = "Display")]
+        [Display(Name = "Highlight IB Region Opacity", Order = 14, GroupName = "Display")]
         public int HighlightIBRegionOpacity
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight IB Range", Order = 18, GroupName = "Display")]
+        [Display(Name = "Highlight IB Range", Order = 15, GroupName = "Display")]
         public bool HighlightIBRange
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight IB Range Color", Order = 19, GroupName = "Display")]
+        [Display(Name = "Highlight IB Range Color", Order = 16, GroupName = "Display")]
         public Brush HighlightIBRangeColor
         { get; set; }
 
@@ -380,25 +357,25 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight IB Range Opacity", Order = 20, GroupName = "Display")]
+        [Display(Name = "Highlight IB Range Opacity", Order = 17, GroupName = "Display")]
         public int HighlightIBRangeOpacity
         { get; set; }
 
-        [Display(Name = "Show Developing Region", Order = 21, GroupName = "Display")]
+        [Display(Name = "Show Developing Region", Order = 18, GroupName = "Display")]
         public bool ShowDevelopingRegion
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Show Labels", Order = 22, GroupName = "Display")]
+        [Display(Name = "Show Labels", Order = 19, GroupName = "Display")]
         public bool ShowLabels
         { get; set; }
 
         [Range(1, 100)]
-        [Display(Name = "Label Size", Order = 23, GroupName = "Display")]
+        [Display(Name = "Label Size", Order = 20, GroupName = "Display")]
         public int LabelSize
         { get; set; }
 
-        [Display(Name = "Label Bold", Order = 24, GroupName = "Display")]
+        [Display(Name = "Label Bold", Order = 21, GroupName = "Display")]
         public bool LabelBold
         { get; set; }
 
@@ -571,9 +548,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 LowColor = Brushes.Red;
                 LowLineWidth = 2;
                 LowLineStyle = DashStyleHelper.Solid;
-                HighlightIBTimeframe = false;
-                HighlightIBTimeframeColor = Brushes.Cyan;
-                HighlightIBTimeframeOpacity = 20;
                 HighlightIBRegion = true;
                 HighlightIBRegionColor = Brushes.Cyan;
                 HighlightIBRegionOpacity = 20;
@@ -591,10 +565,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             else if (State == State.Configure)
             {
                 AddDataSeries(Data.BarsPeriodType.Minute, 1);
-
-                SolidColorBrush highlightTimeframeBrush = HighlightIBTimeframeColor as SolidColorBrush;
-                _highlightTimeframeBrush = new SolidColorBrush(Color.FromArgb((byte)((HighlightIBTimeframeOpacity / 100.0) * 255.0), highlightTimeframeBrush.Color.R, highlightTimeframeBrush.Color.G, highlightTimeframeBrush.Color.B));
-                _highlightTimeframeBrush.Freeze();
             }
             else if (State == State.DataLoaded)
             {
@@ -661,15 +631,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     if (ToTime(Time[CurrentBar - regionStartBar]) == ibStartTime)
                         regionStartBar++; // We found the bar that ENDS at the IB start time, but we want to draw region from the start bar onwards, so start from next bar on chart.
                     currentIBRegion.StartBarIndex = regionStartBar;
-                }
-
-                // Highlight timeframe
-                if (HighlightIBTimeframe)
-                {
-                    if (Time[1] >= currentIBRegion.StartTime && Time[0] <= currentIBRegion.EndTime)
-                    {
-                        BackBrush = _highlightTimeframeBrush;
-                    }
                 }
 
                 // Highlight region
@@ -887,46 +848,91 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         private void CleanupIBRegion(InitialBalanceRegion deadIBRegion)
         {
-            RemoveDrawObjectsWithPrefix($"LunarTickInitialBalance-{deadIBRegion.StartTime.ToString("yyyyMMdd-HHmm")}");
-        }
-
-        private void CleanupIBLabels()
-        {
-            RemoveDrawObjectsWithPrefixAndSuffix("LunarTickInitialBalance", "Label");
-        }
-
-        private void RemoveDrawObjectsWithPrefix(string prefix)
-        {
-            if (string.IsNullOrEmpty(prefix))
-                return;
-
-            DebugPrint($"Removing DrawObjects with prefix [{prefix}]");
-            var tags = DrawObjects.Select(drawObj => drawObj.Tag).ToList();
-            foreach (var tag in tags)
+            var prefix = $"LunarTickInitialBalance-{deadIBRegion.StartTime.ToString("yyyyMMdd-HHmm")}";
+            DebugPrint($"Removing {prefix}");
+            RemoveDrawObject($"{prefix}-Region");
+            RemoveDrawObject($"{prefix}-Range");
+            bool showExt1 = ExtensionLevels != InitialBalanceEnums.InitialBalanceExtensionLevels.None;
+            bool showExt2 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Two || ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;
+            bool showExt3 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;
+            RemoveDrawObject($"{prefix}-IBHigh-Line");
+            RemoveDrawObject($"{prefix}-IBLow-Line");
+            if (showExt1)
             {
-                if (tag.StartsWith(prefix))
+                RemoveDrawObject($"{prefix}-IBHighExt1-Line");
+                RemoveDrawObject($"{prefix}-IBLowExt1-Line");
+            }
+            if (showExt2)
+            {
+                RemoveDrawObject($"{prefix}-IBHighExt2-Line");
+                RemoveDrawObject($"{prefix}-IBLowExt2-Line");
+            }
+            if (showExt3)
+            {
+                RemoveDrawObject($"{prefix}-IBHighExt3-Line");
+                RemoveDrawObject($"{prefix}-IBLowExt3-Line");
+            }
+            if (ShowMidLevels)
+            {
+                RemoveDrawObject($"{prefix}-IBMid-Line");
+                if (showExt1)
                 {
-                    DebugPrint($"Removing DrawObject [{tag}]");
-                    RemoveDrawObject(tag);
+                    RemoveDrawObject($"{prefix}-IBHighExt1Mid-Line");
+                    RemoveDrawObject($"{prefix}-IBLowExt1Mid-Line");
+                }
+                if (showExt2)
+                {
+                    RemoveDrawObject($"{prefix}-IBHighExt2Mid-Line");
+                    RemoveDrawObject($"{prefix}-IBLowExt2Mid-Line");
+                }
+                if (showExt3)
+                {
+                    RemoveDrawObject($"{prefix}-IBHighExt3Mid-Line");
+                    RemoveDrawObject($"{prefix}-IBLowExt3Mid-Line");
                 }
             }
         }
 
-        private void RemoveDrawObjectsWithPrefixAndSuffix(string prefix, string suffix)
+        private void CleanupIBLabels()
         {
-            if (string.IsNullOrEmpty(prefix))
-                return;
-            if (string.IsNullOrEmpty(suffix))
-                return;
-
-            DebugPrint($"Removing DrawObjects with prefix [{prefix}], suffix [{suffix}]");
-            var tags = DrawObjects.Select(drawObj => drawObj.Tag).ToList();
-            foreach (var tag in tags)
+            DebugPrint("Removing InitialBalance labels");
+            bool showExt1 = ExtensionLevels != InitialBalanceEnums.InitialBalanceExtensionLevels.None;
+            bool showExt2 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Two || ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;
+            bool showExt3 = ExtensionLevels == InitialBalanceEnums.InitialBalanceExtensionLevels.Three;
+            RemoveDrawObject("LunarTickInitialBalance-IBHigh-Label");
+            RemoveDrawObject("LunarTickInitialBalance-IBLow-Label");
+            if (showExt1)
             {
-                if (tag.StartsWith(prefix) && tag.EndsWith(suffix))
+                RemoveDrawObject("LunarTickInitialBalance-IBHighExt1-Label");
+                RemoveDrawObject("LunarTickInitialBalance-IBLowExt1-Label");
+            }
+            if (showExt2)
+            {
+                RemoveDrawObject("LunarTickInitialBalance-IBHighExt2-Label");
+                RemoveDrawObject("LunarTickInitialBalance-IBLowExt2-Label");
+            }
+            if (showExt3)
+            {
+                RemoveDrawObject("LunarTickInitialBalance-IBHighExt3-Label");
+                RemoveDrawObject("LunarTickInitialBalance-IBLowExt3-Label");
+            }
+            if (ShowMidLevels)
+            {
+                RemoveDrawObject("LunarTickInitialBalance-IBMid-Label");
+                if (showExt1)
                 {
-                    DebugPrint($"Removing DrawObject [{tag}]");
-                    RemoveDrawObject(tag);
+                    RemoveDrawObject("LunarTickInitialBalance-IBHighExt1Mid-Label");
+                    RemoveDrawObject("LunarTickInitialBalance-IBLowExt1Mid-Label");
+                }
+                if (showExt2)
+                {
+                    RemoveDrawObject("LunarTickInitialBalance-IBHighExt2Mid-Label");
+                    RemoveDrawObject("LunarTickInitialBalance-IBLowExt2Mid-Label");
+                }
+                if (showExt3)
+                {
+                    RemoveDrawObject("LunarTickInitialBalance-IBHighExt3Mid-Label");
+                    RemoveDrawObject("LunarTickInitialBalance-IBLowExt3Mid-Label");
                 }
             }
         }
@@ -1000,18 +1006,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 propertyDescriptorCollection.Add(midColorPropertyDesc);
                 propertyDescriptorCollection.Add(midLineWidthPropertyDesc);
                 propertyDescriptorCollection.Add(midLineStylePropertyDesc);
-            }
-
-
-            // Show/hide properties related to HighlightIBTimeframe
-            PropertyDescriptor highlightIBTimeframeColorPropertyDesc = propertyDescriptorCollection["HighlightIBTimeframeColor"];
-            PropertyDescriptor highlightIBTimeframeOpacityPropertyDesc = propertyDescriptorCollection["HighlightIBTimeframeOpacity"];
-            propertyDescriptorCollection.Remove(highlightIBTimeframeColorPropertyDesc);
-            propertyDescriptorCollection.Remove(highlightIBTimeframeOpacityPropertyDesc);
-            if (indicator.HighlightIBTimeframe)
-            {
-                propertyDescriptorCollection.Add(highlightIBTimeframeColorPropertyDesc);
-                propertyDescriptorCollection.Add(highlightIBTimeframeOpacityPropertyDesc);
             }
 
 

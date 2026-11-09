@@ -176,14 +176,13 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.1.1";
+        public const string Version = "1.1.2";
 
         #endregion
 
         #region Members
 
         private List<ORBRegion> _orbRegions = new List<ORBRegion>();
-        private Brush _highlightTimeframeBrush;
         private SimpleFont _labelFont;
         private int _decimalPlaces = 0;
         private int _lastBarUpdated = -1;
@@ -324,34 +323,12 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight ORB Timeframe", Order = 12, GroupName = "Display")]
-        public bool HighlightORBTimeframe
-        { get; set; }
-
-        [XmlIgnore]
-        [Display(Name = "Highlight ORB Timeframe Color", Order = 13, GroupName = "Display")]
-        public Brush HighlightORBTimeframeColor
-        { get; set; }
-
-        [Browsable(false)]
-        public string HighlightORBTimeframeColorSerializable
-        {
-            get { return Serialize.BrushToString(HighlightORBTimeframeColor); }
-            set { HighlightORBTimeframeColor = Serialize.StringToBrush(value); }
-        }
-
-        [Range(0, 100)]
-        [Display(Name = "Highlight ORB Timeframe Opacity", Order = 14, GroupName = "Display")]
-        public int HighlightORBTimeframeOpacity
-        { get; set; }
-
-        [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight ORB Region", Order = 15, GroupName = "Display")]
+        [Display(Name = "Highlight ORB Region", Order = 12, GroupName = "Display")]
         public bool HighlightORBRegion
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight ORB Region Color", Order = 16, GroupName = "Display")]
+        [Display(Name = "Highlight ORB Region Color", Order = 13, GroupName = "Display")]
         public Brush HighlightORBRegionColor
         { get; set; }
 
@@ -363,17 +340,17 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight ORB Region Opacity", Order = 17, GroupName = "Display")]
+        [Display(Name = "Highlight ORB Region Opacity", Order = 14, GroupName = "Display")]
         public int HighlightORBRegionOpacity
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Highlight ORB Range", Order = 18, GroupName = "Display")]
+        [Display(Name = "Highlight ORB Range", Order = 15, GroupName = "Display")]
         public bool HighlightORBRange
         { get; set; }
 
         [XmlIgnore]
-        [Display(Name = "Highlight ORB Range Color", Order = 19, GroupName = "Display")]
+        [Display(Name = "Highlight ORB Range Color", Order = 16, GroupName = "Display")]
         public Brush HighlightORBRangeColor
         { get; set; }
 
@@ -385,25 +362,25 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
         }
 
         [Range(0, 100)]
-        [Display(Name = "Highlight ORB Range Opacity", Order = 20, GroupName = "Display")]
+        [Display(Name = "Highlight ORB Range Opacity", Order = 17, GroupName = "Display")]
         public int HighlightORBRangeOpacity
         { get; set; }
 
-        [Display(Name = "Show Developing Region", Order = 21, GroupName = "Display")]
+        [Display(Name = "Show Developing Region", Order = 18, GroupName = "Display")]
         public bool ShowDevelopingRegion
         { get; set; }
 
         [RefreshProperties(RefreshProperties.All)]
-        [Display(Name = "Show Labels", Order = 22, GroupName = "Display")]
+        [Display(Name = "Show Labels", Order = 19, GroupName = "Display")]
         public bool ShowLabels
         { get; set; }
 
         [Range(1, 100)]
-        [Display(Name = "Label Size", Order = 23, GroupName = "Display")]
+        [Display(Name = "Label Size", Order = 20, GroupName = "Display")]
         public int LabelSize
         { get; set; }
 
-        [Display(Name = "Label Bold", Order = 24, GroupName = "Display")]
+        [Display(Name = "Label Bold", Order = 21, GroupName = "Display")]
         public bool LabelBold
         { get; set; }
 
@@ -577,9 +554,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 LowColor = Brushes.Purple;
                 LowLineWidth = 2;
                 LowLineStyle = DashStyleHelper.Solid;
-                HighlightORBTimeframe = false;
-                HighlightORBTimeframeColor = Brushes.Magenta;
-                HighlightORBTimeframeOpacity = 20;
                 HighlightORBRegion = true;
                 HighlightORBRegionColor = Brushes.Magenta;
                 HighlightORBRegionOpacity = 20;
@@ -597,10 +571,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
             else if (State == State.Configure)
             {
                 AddDataSeries(Data.BarsPeriodType.Minute, 1);
-
-                SolidColorBrush highlightTimeframeBrush = HighlightORBTimeframeColor as SolidColorBrush;
-                _highlightTimeframeBrush = new SolidColorBrush(Color.FromArgb((byte)((HighlightORBTimeframeOpacity / 100.0) * 255.0), highlightTimeframeBrush.Color.R, highlightTimeframeBrush.Color.G, highlightTimeframeBrush.Color.B));
-                _highlightTimeframeBrush.Freeze();
             }
             else if (State == State.DataLoaded)
             {
@@ -667,15 +637,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                     if (ToTime(Time[CurrentBar - regionStartBar]) == orbStartTime)
                         regionStartBar++; // We found the bar that ENDS at the ORB start time, but we want to draw region from the start bar onwards, so start from next bar on chart.
                     currentORBRegion.StartBarIndex = regionStartBar;
-                }
-
-                // Highlight timeframe
-                if (HighlightORBTimeframe)
-                {
-                    if (Time[1] >= currentORBRegion.StartTime && Time[0] <= currentORBRegion.EndTime)
-                    {
-                        BackBrush = _highlightTimeframeBrush;
-                    }
                 }
 
                 // Highlight region
@@ -893,46 +854,91 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         private void CleanupORBRegion(ORBRegion deadORBRegion)
         {
-            RemoveDrawObjectsWithPrefix($"LunarTickORB-{deadORBRegion.StartTime.ToString("yyyyMMdd-HHmm")}");
-        }
-
-        private void CleanupORBLabels()
-        {
-            RemoveDrawObjectsWithPrefixAndSuffix("LunarTickORB", "Label");
-        }
-
-        private void RemoveDrawObjectsWithPrefix(string prefix)
-        {
-            if (string.IsNullOrEmpty(prefix))
-                return;
-
-            DebugPrint($"Removing DrawObjects with prefix [{prefix}]");
-            var tags = DrawObjects.Select(drawObj => drawObj.Tag).ToList();
-            foreach (var tag in tags)
+            var prefix = $"LunarTickORB-{deadORBRegion.StartTime.ToString("yyyyMMdd-HHmm")}";
+            DebugPrint($"Removing {prefix}");
+            RemoveDrawObject($"{prefix}-Region");
+            RemoveDrawObject($"{prefix}-Range");
+            bool showExt1 = ExtensionLevels != ORBEnums.ORBExtensionLevels.None;
+            bool showExt2 = ExtensionLevels == ORBEnums.ORBExtensionLevels.Two || ExtensionLevels == ORBEnums.ORBExtensionLevels.Three;
+            bool showExt3 = ExtensionLevels == ORBEnums.ORBExtensionLevels.Three;
+            RemoveDrawObject($"{prefix}-ORBHigh-Line");
+            RemoveDrawObject($"{prefix}-ORBLow-Line");
+            if (showExt1)
             {
-                if (tag.StartsWith(prefix))
+                RemoveDrawObject($"{prefix}-ORBHighExt1-Line");
+                RemoveDrawObject($"{prefix}-ORBLowExt1-Line");
+            }
+            if (showExt2)
+            {
+                RemoveDrawObject($"{prefix}-ORBHighExt2-Line");
+                RemoveDrawObject($"{prefix}-ORBLowExt2-Line");
+            }
+            if (showExt3)
+            {
+                RemoveDrawObject($"{prefix}-ORBHighExt3-Line");
+                RemoveDrawObject($"{prefix}-ORBLowExt3-Line");
+            }
+            if (ShowMidLevels)
+            {
+                RemoveDrawObject($"{prefix}-ORBMid-Line");
+                if (showExt1)
                 {
-                    DebugPrint($"Removing DrawObject [{tag}]");
-                    RemoveDrawObject(tag);
+                    RemoveDrawObject($"{prefix}-ORBHighExt1Mid-Line");
+                    RemoveDrawObject($"{prefix}-ORBLowExt1Mid-Line");
+                }
+                if (showExt2)
+                {
+                    RemoveDrawObject($"{prefix}-ORBHighExt2Mid-Line");
+                    RemoveDrawObject($"{prefix}-ORBLowExt2Mid-Line");
+                }
+                if (showExt3)
+                {
+                    RemoveDrawObject($"{prefix}-ORBHighExt3Mid-Line");
+                    RemoveDrawObject($"{prefix}-ORBLowExt3Mid-Line");
                 }
             }
         }
 
-        private void RemoveDrawObjectsWithPrefixAndSuffix(string prefix, string suffix)
+        private void CleanupORBLabels()
         {
-            if (string.IsNullOrEmpty(prefix))
-                return;
-            if (string.IsNullOrEmpty(suffix))
-                return;
-
-            DebugPrint($"Removing DrawObjects with prefix [{prefix}], suffix [{suffix}]");
-            var tags = DrawObjects.Select(drawObj => drawObj.Tag).ToList();
-            foreach (var tag in tags)
+            DebugPrint("Removing ORB labels");
+            bool showExt1 = ExtensionLevels != ORBEnums.ORBExtensionLevels.None;
+            bool showExt2 = ExtensionLevels == ORBEnums.ORBExtensionLevels.Two || ExtensionLevels == ORBEnums.ORBExtensionLevels.Three;
+            bool showExt3 = ExtensionLevels == ORBEnums.ORBExtensionLevels.Three;
+            RemoveDrawObject("LunarTickORB-ORBHigh-Label");
+            RemoveDrawObject("LunarTickORB-ORBLow-Label");
+            if (showExt1)
             {
-                if (tag.StartsWith(prefix) && tag.EndsWith(suffix))
+                RemoveDrawObject("LunarTickORB-ORBHighExt1-Label");
+                RemoveDrawObject("LunarTickORB-ORBLowExt1-Label");
+            }
+            if (showExt2)
+            {
+                RemoveDrawObject("LunarTickORB-ORBHighExt2-Label");
+                RemoveDrawObject("LunarTickORB-ORBLowExt2-Label");
+            }
+            if (showExt3)
+            {
+                RemoveDrawObject("LunarTickORB-ORBHighExt3-Label");
+                RemoveDrawObject("LunarTickORB-ORBLowExt3-Label");
+            }
+            if (ShowMidLevels)
+            {
+                RemoveDrawObject("LunarTickORB-ORBMid-Label");
+                if (showExt1)
                 {
-                    DebugPrint($"Removing DrawObject [{tag}]");
-                    RemoveDrawObject(tag);
+                    RemoveDrawObject("LunarTickORB-ORBHighExt1Mid-Label");
+                    RemoveDrawObject("LunarTickORB-ORBLowExt1Mid-Label");
+                }
+                if (showExt2)
+                {
+                    RemoveDrawObject("LunarTickORB-ORBHighExt2Mid-Label");
+                    RemoveDrawObject("LunarTickORB-ORBLowExt2Mid-Label");
+                }
+                if (showExt3)
+                {
+                    RemoveDrawObject("LunarTickORB-ORBHighExt3Mid-Label");
+                    RemoveDrawObject("LunarTickORB-ORBLowExt3Mid-Label");
                 }
             }
         }
@@ -1006,18 +1012,6 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 propertyDescriptorCollection.Add(midColorPropertyDesc);
                 propertyDescriptorCollection.Add(midLineWidthPropertyDesc);
                 propertyDescriptorCollection.Add(midLineStylePropertyDesc);
-            }
-
-
-            // Show/hide properties related to HighlightORBTimeframe
-            PropertyDescriptor highlightORBTimeframeColorPropertyDesc = propertyDescriptorCollection["HighlightORBTimeframeColor"];
-            PropertyDescriptor highlightORBTimeframeOpacityPropertyDesc = propertyDescriptorCollection["HighlightORBTimeframeOpacity"];
-            propertyDescriptorCollection.Remove(highlightORBTimeframeColorPropertyDesc);
-            propertyDescriptorCollection.Remove(highlightORBTimeframeOpacityPropertyDesc);
-            if (indicator.HighlightORBTimeframe)
-            {
-                propertyDescriptorCollection.Add(highlightORBTimeframeColorPropertyDesc);
-                propertyDescriptorCollection.Add(highlightORBTimeframeOpacityPropertyDesc);
             }
 
 
