@@ -176,7 +176,7 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
 
         #region Constants
 
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
 
         #endregion
 
@@ -907,12 +907,13 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 return;
 
             DebugPrint($"Removing DrawObjects with prefix [{prefix}]");
-            foreach (var drawObj in DrawObjects)
+            var tags = DrawObjects.Select(drawObj => drawObj.Tag).ToList();
+            foreach (var tag in tags)
             {
-                if (drawObj.Tag.StartsWith(prefix))
+                if (tag.StartsWith(prefix))
                 {
-                    DebugPrint($"Removing DrawObject [{drawObj.Tag}]");
-                    RemoveDrawObject(drawObj.Tag);
+                    DebugPrint($"Removing DrawObject [{tag}]");
+                    RemoveDrawObject(tag);
                 }
             }
         }
@@ -925,12 +926,13 @@ namespace NinjaTrader.NinjaScript.Indicators.LunarTick
                 return;
 
             DebugPrint($"Removing DrawObjects with prefix [{prefix}], suffix [{suffix}]");
-            foreach (var drawObj in DrawObjects)
+            var tags = DrawObjects.Select(drawObj => drawObj.Tag).ToList();
+            foreach (var tag in tags)
             {
-                if (drawObj.Tag.StartsWith(prefix) && drawObj.Tag.EndsWith(suffix))
+                if (tag.StartsWith(prefix) && tag.EndsWith(suffix))
                 {
-                    DebugPrint($"Removing DrawObject [{drawObj.Tag}]");
-                    RemoveDrawObject(drawObj.Tag);
+                    DebugPrint($"Removing DrawObject [{tag}]");
+                    RemoveDrawObject(tag);
                 }
             }
         }
